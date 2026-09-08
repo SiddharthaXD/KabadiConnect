@@ -1,0 +1,11 @@
+{
+  "name": "SmartKabadi",
+  "description": "AI-powered vernacular e-waste recycling, rate discovery, and weighing platform for scrap collectors and recyclers.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
