@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ScrapItem, ScreenName, Language } from '../types';
 import { SCRAP_ITEMS } from '../data/scrapData';
 import { TRANSLATIONS } from '../data/translations';
-import { speakVernacular, triggerHaptic } from '../utils/speech';
+import { speakVernacular, stopSpeech, triggerHaptic } from '../utils/speech';
 import { LanguageBar } from './LanguageBar';
 
 interface HomeDashboardProps {
@@ -30,7 +30,9 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   const [purchasePrice, setPurchasePrice] = useState<number>(180);
   const [selectedScrapId, setSelectedScrapId] = useState<string>(SCRAP_ITEMS[0].id);
   const [transcript, setTranscript] = useState<string>('');
+  const [speechMode, setSpeechMode] = useState<'stt' | 'tts'>('stt');
   const [isListening, setIsListening] = React.useState<boolean>(false);
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const recognitionRef = React.useRef<any>(null);
 
   const handleToggleListen = () => {
@@ -54,7 +56,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       let currentTranscript = '';
       for (let i = 0; i < event.results.length; i++) {
         currentTranscript += event.results[i][0].transcript;
@@ -62,7 +64,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
       setTranscript(currentTranscript);
     };
 
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any) => {
       console.error('Speech recognition error', event.error);
       setIsListening(false);
     };
@@ -74,6 +76,47 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     recognitionRef.current = recognition;
     recognition.start();
     setIsListening(true);
+  };
+
+  const handleSpeakText = () => {
+    triggerHaptic(20);
+    if (isSpeaking) {
+      stopSpeech();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const textToSpeak = transcript.trim() || (
+      language === 'mr'
+        ? 'कबाडीवाला कनेक्ट मध्ये आपले स्वागत आहे. येथे थेट शासकीय दराने ई-कचरा खरेदी करा.'
+        : language === 'hi'
+        ? 'कबाड़ीवाला कनेक्ट में आपका स्वागत है। यहाँ सरकारी मंडी भाव से ई-कचरा बेचें।'
+        : 'Welcome to Kabadiwala Connect. Discover real-time scrap rates and scan e-waste easily.'
+    );
+
+    if (!transcript.trim()) {
+      setTranscript(textToSpeak);
+    }
+
+    setIsSpeaking(true);
+    speakVernacular(textToSpeak, language, true, {
+      onStart: () => setIsSpeaking(true),
+      onEnd: () => setIsSpeaking(false),
+      onError: () => setIsSpeaking(false),
+    });
+  };
+
+  const handleSwitchSpeechMode = (mode: 'stt' | 'tts') => {
+    triggerHaptic(15);
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+    if (isSpeaking) {
+      stopSpeech();
+      setIsSpeaking(false);
+    }
+    setSpeechMode(mode);
   };
   const t = TRANSLATIONS[language];
   const kb = t.kabadiwala;
@@ -592,44 +635,215 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
       </section>
 
       
-      {/* 6. Speech to Text Utility */}
+      {/* 6. Speech & Voice Utility (STT / TTS Toggle) */}
       <section className="w-full bg-[#dae2fd] rounded-xl p-4 shadow-[0_4px_0px_#191c1e] border-2 border-[#191c1e] flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[24px] text-[#003b8e]">
-              mic
-            </span>
-            <span className="text-[16px] font-black text-[#191c1e]">
-              {language === 'en' ? 'Speech to Text' : language === 'mr' ? 'स्पीच टू टेक्स्ट (आवाज टाईपिंग)' : 'स्पीच टू टेक्स्ट (आवाज़ टाइपिंग)'}
-            </span>
+        {/* Mode Toggle Header */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[24px] text-[#003b8e]">
+                {speechMode === 'stt' ? 'mic' : 'volume_up'}
+              </span>
+              <span className="text-[16px] font-black text-[#191c1e]">
+                {speechMode === 'stt'
+                  ? language === 'en'
+                    ? 'Speech to Text (STT)'
+                    : language === 'mr'
+                    ? 'स्पीच टू टेक्स्ट (आवाज टाईपिंग)'
+                    : 'स्पीच टू टेक्स्ट (आवाज़ टाइपिंग)'
+                  : language === 'en'
+                  ? 'Text to Speech (TTS)'
+                  : language === 'mr'
+                  ? 'टेक्स्ट टू स्पीच (मजकूर ऐका)'
+                  : 'टेक्स्ट टू स्पीच (बोलकर सुनें)'}
+              </span>
+            </div>
+
+            {/* Live active badges */}
+            {speechMode === 'stt' && isListening && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#ba1a1a]/10 text-[#ba1a1a] text-[10px] font-bold uppercase animate-pulse border border-[#ba1a1a]/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]"></span>
+                {language === 'en' ? 'Listening...' : language === 'mr' ? 'ऐकत आहे...' : 'सुन रहा है...'}
+              </span>
+            )}
+            {speechMode === 'tts' && isSpeaking && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#006948]/10 text-[#006948] text-[10px] font-bold uppercase animate-pulse border border-[#006948]/30">
+                <span className="material-symbols-outlined text-[12px] animate-bounce">graphic_eq</span>
+                {language === 'en' ? 'Speaking...' : language === 'mr' ? 'बोलत आहे...' : 'बोल रहा है...'}
+              </span>
+            )}
           </div>
-          {isListening && (
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#ba1a1a]/10 text-[#ba1a1a] text-[10px] font-bold uppercase animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]"></span>
-              {language === 'en' ? 'Listening' : language === 'mr' ? 'ऐकत आहे' : 'सुन रहा है'}
-            </span>
-          )}
+
+          {/* Segmented Mode Switcher */}
+          <div className="grid grid-cols-2 gap-1.5 p-1 bg-white/70 rounded-xl border border-[#003b8e]/20 shadow-inner">
+            <button
+              type="button"
+              onClick={() => handleSwitchSpeechMode('stt')}
+              className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[12px] font-bold transition-all ${
+                speechMode === 'stt'
+                  ? 'bg-[#003b8e] text-white shadow-sm'
+                  : 'text-[#003b8e] hover:bg-white/80'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">mic</span>
+              <span>{language === 'en' ? 'Speech to Text' : language === 'mr' ? 'आवाजातून टाईप' : 'आवाज़ से लिखें'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSwitchSpeechMode('tts')}
+              className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[12px] font-bold transition-all ${
+                speechMode === 'tts'
+                  ? 'bg-[#006948] text-white shadow-sm'
+                  : 'text-[#006948] hover:bg-white/80'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">volume_up</span>
+              <span>{language === 'en' ? 'Text to Speech' : language === 'mr' ? 'मजकूर ऐका' : 'बोलकर सुनें'}</span>
+            </button>
+          </div>
         </div>
-        
+
+        {/* Guidance Prompt */}
         <p className="text-[12px] text-[#003b8e] font-medium leading-tight">
-          {language === 'en' ? 'Tap the microphone and speak. The app will type your words automatically.' : language === 'mr' ? 'मायक्रोफोन दाबा आणि बोला. ॲप तुमचे शब्द आपोआप टाईप करेल.' : 'माइक्रोफोन दबाएं और बोलें। ऐप आपके शब्दों को अपने आप टाइप करेगा।'}
+          {speechMode === 'stt'
+            ? language === 'en'
+              ? 'Tap the microphone and speak. The app will type your words automatically.'
+              : language === 'mr'
+              ? 'मायक्रोफोन दाबा आणि बोला. ॲप तुमचे शब्द आपोआप टाईप करेल.'
+              : 'माइक्रोफोन दबाएं और बोलें। ऐप आपके शब्दों को अपने आप टाइप करेगा।'
+            : language === 'en'
+            ? 'Type or paste text below and tap "Read Aloud" to hear clear vernacular voice playback.'
+            : language === 'mr'
+            ? 'खाली मजकूर लिहा किंवा पेस्ट करा आणि आवाज ऐकण्यासाठी "वाचून दाखवा" दाबा.'
+            : 'नीचे टेक्स्ट लिखें या पेस्ट करें और आवाज़ में सुनने के लिए "बोलकर सुनाएं" दबाएं।'}
         </p>
+
+        {/* Preset chips for TTS */}
+        {speechMode === 'tts' && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] scrollbar-none">
+            <span className="text-[11px] font-bold text-[#003b8e] shrink-0">
+              {language === 'en' ? 'Sample:' : language === 'mr' ? 'उदा:' : 'उदा:'}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic(10);
+                setTranscript(
+                  language === 'mr'
+                    ? 'आजचे थेट बाजार भाव: पीसीबी मदरबोर्ड २८० रुपये किलो, तांब्याची वायर ५४० रुपये किलो.'
+                    : language === 'hi'
+                    ? 'आज के लाइव मंडी भाव: पीसीबी मदरबोर्ड ₹280 प्रति किलो, तांबा वायर ₹540 प्रति किलो।'
+                    : 'Live Scrap Rates: PCB Motherboard ₹280 per kg, Copper Wire ₹540 per kg.'
+                );
+              }}
+              className="px-2.5 py-1 rounded-full bg-white text-[#003b8e] border border-[#003b8e]/30 shrink-0 hover:bg-[#003b8e]/10 active:scale-95 font-semibold"
+            >
+              {language === 'en' ? 'Mandi Rates' : language === 'mr' ? 'बाजार भाव' : 'मंडी भाव'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic(10);
+                setTranscript(
+                  language === 'mr'
+                    ? 'सावधान! ई-कचरा हाताळताना सुरक्षिततेचे हातमोजे वापरा.'
+                    : language === 'hi'
+                    ? 'सावधानी! ई-कचरा संभालते समय सुरक्षा दस्ताने पहनें।'
+                    : 'Safety Notice: Always wear protective safety gloves when handling e-waste.'
+                );
+              }}
+              className="px-2.5 py-1 rounded-full bg-white text-[#003b8e] border border-[#003b8e]/30 shrink-0 hover:bg-[#003b8e]/10 active:scale-95 font-semibold"
+            >
+              {language === 'en' ? 'Safety Notice' : language === 'mr' ? 'सुरक्षितता' : 'सुरक्षा निर्देश'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic(10);
+                setTranscript(
+                  language === 'mr'
+                    ? 'कबाडीवाला कनेक्ट मध्ये आपले स्वागत आहे. थेट शासकीय दराने ई-कचरा विक्री करा.'
+                    : language === 'hi'
+                    ? 'कबाड़ीवाला कनेक्ट में आपका स्वागत है। सीधे सरकारी दरों पर ई-कचरा बेचें।'
+                    : 'Welcome to Kabadiwala Connect. Sell certified e-waste directly at verified rates.'
+                );
+              }}
+              className="px-2.5 py-1 rounded-full bg-white text-[#003b8e] border border-[#003b8e]/30 shrink-0 hover:bg-[#003b8e]/10 active:scale-95 font-semibold"
+            >
+              {language === 'en' ? 'Welcome' : language === 'mr' ? 'स्वागत' : 'स्वागत'}
+            </button>
+          </div>
+        )}
 
         <textarea
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
-          placeholder={language === 'en' ? 'Your speech will appear here...' : language === 'mr' ? 'तुमचे बोलणे येथे दिसेल...' : 'आपकी आवाज़ यहाँ टाइप होगी...'}
-          className="w-full bg-white border border-[#003b8e]/30 rounded-lg p-3 text-[14px] font-medium text-[#191c1e] outline-none focus:border-[#003b8e] min-h-[80px] resize-none"
+          placeholder={
+            speechMode === 'stt'
+              ? language === 'en'
+                ? 'Your speech will appear here...'
+                : language === 'mr'
+                ? 'तुमचे बोलणे येथे दिसेल...'
+                : 'आपकी आवाज़ यहाँ टाइप होगी...'
+              : language === 'en'
+              ? 'Enter text to convert into speech...'
+              : language === 'mr'
+              ? 'आवाजात ऐकण्यासाठी मजकूर येथे टाईप करा...'
+              : 'आवाज़ में सुनने के लिए टेक्स्ट यहाँ टाइप करें...'
+          }
+          className="w-full bg-white border border-[#003b8e]/30 rounded-lg p-3 text-[14px] font-medium text-[#191c1e] outline-none focus:border-[#003b8e] min-h-[85px] resize-none shadow-inner"
         />
 
+        {/* Action Controls */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleToggleListen}
-            className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all ${isListening ? 'bg-[#ba1a1a]' : 'bg-[#003b8e]'}`}
-          >
-            <span className="material-symbols-outlined text-[20px]">{isListening ? 'mic_off' : 'mic'}</span>
-            <span>{isListening ? (language === 'en' ? 'Stop Listening' : language === 'mr' ? 'थांबवा' : 'रोकें') : (language === 'en' ? 'Start Listening' : language === 'mr' ? 'बोलायला सुरू करा' : 'बोलना शुरू करें')}</span>
-          </button>
+          {speechMode === 'stt' ? (
+            <button
+              onClick={handleToggleListen}
+              className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all ${
+                isListening ? 'bg-[#ba1a1a]' : 'bg-[#003b8e]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[20px]">{isListening ? 'mic_off' : 'mic'}</span>
+              <span>
+                {isListening
+                  ? language === 'en'
+                    ? 'Stop Listening'
+                    : language === 'mr'
+                    ? 'थांबवा'
+                    : 'रोकें'
+                  : language === 'en'
+                  ? 'Start Listening'
+                  : language === 'mr'
+                  ? 'बोलायला सुरू करा'
+                  : 'बोलना शुरू करें'}
+              </span>
+            </button>
+          ) : (
+            <button
+              onClick={handleSpeakText}
+              className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all ${
+                isSpeaking ? 'bg-[#ba1a1a]' : 'bg-[#006948]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                {isSpeaking ? 'stop_circle' : 'volume_up'}
+              </span>
+              <span>
+                {isSpeaking
+                  ? language === 'en'
+                    ? 'Stop Speaking'
+                    : language === 'mr'
+                    ? 'आवाज थांबवा'
+                    : 'आवाज़ रोकें'
+                  : language === 'en'
+                  ? 'Read Aloud (Play Audio)'
+                  : language === 'mr'
+                  ? 'वाचून दाखवा (मजकूर ऐका)'
+                  : 'बोलकर सुनाएं (ऑडियो)'}
+              </span>
+            </button>
+          )}
+
           <button
             onClick={() => {
               triggerHaptic(10);
@@ -640,10 +854,15 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           >
             <span className="material-symbols-outlined text-[20px]">search</span>
           </button>
+
           <button
             onClick={() => {
-               triggerHaptic(10);
-               setTranscript('');
+              triggerHaptic(10);
+              setTranscript('');
+              if (isSpeaking) {
+                stopSpeech();
+                setIsSpeaking(false);
+              }
             }}
             className="w-11 h-11 bg-white border border-[#003b8e]/30 rounded-xl flex items-center justify-center text-[#ba1a1a] active:scale-95 shadow-sm transition-transform hover:bg-[#ba1a1a]/10"
             title={language === 'en' ? 'Clear Text' : language === 'mr' ? 'मजकूर पुसा' : 'टेक्स्ट साफ़ करें'}

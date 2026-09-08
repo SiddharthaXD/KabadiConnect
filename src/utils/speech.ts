@@ -129,10 +129,16 @@ function findBestVoice(lang: Language): SpeechSynthesisVoice | null {
 export function speakVernacular(
   text: string,
   lang: Language = 'hi',
-  playChime: boolean = true
+  playChime: boolean = true,
+  callbacks?: {
+    onStart?: () => void;
+    onEnd?: () => void;
+    onError?: (err: any) => void;
+  }
 ) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     console.warn('Speech synthesis is not supported on this browser.');
+    callbacks?.onError?.('Speech synthesis not supported');
     return;
   }
 
@@ -164,10 +170,21 @@ export function speakVernacular(
       utterance.voice = matchedVoice;
     }
 
+    if (callbacks?.onStart) {
+      utterance.onstart = () => callbacks.onStart?.();
+    }
+    if (callbacks?.onEnd) {
+      utterance.onend = () => callbacks.onEnd?.();
+    }
+    if (callbacks?.onError) {
+      utterance.onerror = (e) => callbacks.onError?.(e);
+    }
+
     window.speechSynthesis.speak(utterance);
     triggerHaptic(20);
   } catch (err) {
     console.error('Speech synthesis error:', err);
+    callbacks?.onError?.(err);
   }
 }
 

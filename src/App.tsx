@@ -48,8 +48,37 @@ export default function App() {
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [showOfflineToast, setShowOfflineToast] = useState<boolean>(false);
   const [offlineToastMode, setOfflineToastMode] = useState<'offline' | 'restored'>('offline');
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('kabadiwala_theme') === 'dark';
+    } catch {
+      return false;
+    }
+  });
   const prevOnlineRef = useRef<boolean>(true);
   const isFirstMountRef = useRef<boolean>(true);
+
+  // Sync dark mode class to document element and localStorage
+  useEffect(() => {
+    try {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+        localStorage.setItem('kabadiwala_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+        localStorage.setItem('kabadiwala_theme', 'light');
+      }
+    } catch (e) {
+      console.error('Failed to update dark mode', e);
+    }
+  }, [isDarkMode]);
+
+  const handleToggleDarkMode = () => {
+    triggerHaptic(25);
+    setIsDarkMode((prev) => !prev);
+  };
 
   // Prevent background body scrolling when any modal is open (removes duplicate/unnecessary background scrollbar)
   useEffect(() => {
@@ -285,6 +314,8 @@ export default function App() {
         title={getScreenTitle()}
         userProfile={userProfile}
         isLoggedIn={isLoggedIn}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={handleToggleDarkMode}
         onOpenLogin={() => {
           triggerHaptic(20);
           setShowLoginModal(true);
@@ -391,6 +422,14 @@ export default function App() {
         {currentScreen === 'support' && (
           <SupportScreen
             language={language}
+            transactions={transactions}
+            isOnline={isOnline}
+            onImportTransactions={(imported) => {
+              setTransactions(imported);
+              if (imported.length > 0) {
+                setActiveReceipt(imported[0]);
+              }
+            }}
             onResetData={() => {
               setTransactions(INITIAL_TRANSACTIONS);
               setActiveReceipt(INITIAL_TRANSACTIONS[0]);

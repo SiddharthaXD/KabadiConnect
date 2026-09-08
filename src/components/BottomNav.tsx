@@ -29,7 +29,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   const isSupportActive = currentScreen === 'support';
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.06)] border-t border-[#bccac0]/30 pb-safe">
+    <nav className="fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-[#111820]/95 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.06)] border-t border-[#bccac0]/30 dark:border-[#273544] pb-safe">
       <div className="max-w-md mx-auto flex justify-around items-center h-18 px-3">
         {/* Home / Recycler Portal */}
         <button
@@ -39,7 +39,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             onNavigate(isRecycler ? 'recycler_dashboard' : 'home');
           }}
           className={`flex flex-col items-center justify-center min-w-[72px] py-1 gap-0.5 transition-colors ${
-            isHomeActive ? 'text-[#006948] font-bold' : 'text-[#565e74] hover:text-[#191c1e]'
+            isHomeActive
+              ? 'text-[#006948] dark:text-[#34d399] font-bold'
+              : 'text-[#565e74] dark:text-[#94a3b8] hover:text-[#191c1e] dark:hover:text-[#ffffff]'
           }`}
         >
           <span
@@ -66,7 +68,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             onNavigate('ledger');
           }}
           className={`flex flex-col items-center justify-center min-w-[72px] py-1 gap-0.5 transition-colors ${
-            isLedgerActive ? 'text-[#006948] font-bold' : 'text-[#565e74] hover:text-[#191c1e]'
+            isLedgerActive
+              ? 'text-[#006948] dark:text-[#34d399] font-bold'
+              : 'text-[#565e74] dark:text-[#94a3b8] hover:text-[#191c1e] dark:hover:text-[#ffffff]'
           }`}
         >
           <span
@@ -89,7 +93,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             onNavigate('support');
           }}
           className={`flex flex-col items-center justify-center min-w-[72px] py-1 gap-0.5 transition-colors ${
-            isSupportActive ? 'text-[#006948] font-bold' : 'text-[#565e74] hover:text-[#191c1e]'
+            isSupportActive
+              ? 'text-[#006948] dark:text-[#34d399] font-bold'
+              : 'text-[#565e74] dark:text-[#94a3b8] hover:text-[#191c1e] dark:hover:text-[#ffffff]'
           }`}
         >
           <span

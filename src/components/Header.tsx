@@ -16,6 +16,8 @@ interface HeaderProps {
   onOpenLogin: () => void;
   onToggleOnline?: () => void;
   isLoggedIn?: boolean;
+  isDarkMode?: boolean;
+  onToggleDarkMode?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -31,6 +33,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenLogin,
   onToggleOnline,
   isLoggedIn,
+  isDarkMode = false,
+  onToggleDarkMode,
 }) => {
   const isHome = currentScreen === 'home';
 
@@ -156,6 +160,68 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5">
+            {/* Global High-Contrast Dark Mode Toggle */}
+            <button
+              id="btn-header-dark-mode"
+              type="button"
+              onClick={() => {
+                triggerHaptic(20);
+                onToggleDarkMode?.();
+              }}
+              aria-label={
+                isDarkMode
+                  ? language === 'mr'
+                    ? 'लाइट मोड सुरू करा (Daylight Mode)'
+                    : language === 'en'
+                    ? 'Switch to Light Mode'
+                    : 'लाइट मोड चालू करें'
+                  : language === 'mr'
+                  ? 'हाय-कॉन्ट्रास्ट डार्क मोड (Outdoor Dark Mode)'
+                  : language === 'en'
+                  ? 'Switch to High-Contrast Dark Mode'
+                  : 'हाई-कंट्रास्ट डार्क मोड'
+              }
+              title={
+                isDarkMode
+                  ? language === 'mr'
+                    ? 'लाइट मोड / Daylight'
+                    : language === 'en'
+                    ? 'Light Mode'
+                    : 'लाइट मोड'
+                  : language === 'mr'
+                  ? 'डार्क मोड / Outdoor Dark'
+                  : language === 'en'
+                  ? 'High-Contrast Dark Mode'
+                  : 'डार्क मोड'
+              }
+              className={`h-9 px-2.5 rounded-full flex items-center justify-center gap-1 transition-all shadow-sm active:scale-95 border cursor-pointer ${
+                isDarkMode
+                  ? 'bg-[#1e293b] text-[#fbbf24] border-[#fbbf24]/40 shadow-[0_0_8px_rgba(251,191,36,0.2)]'
+                  : 'bg-[#f1f5f9] text-[#334155] border-[#cbd5e1] hover:bg-[#e2e8f0]'
+              }`}
+            >
+              <span
+                className={`material-symbols-outlined text-[18px] ${
+                  isDarkMode ? 'text-[#fbbf24]' : 'text-[#475569]'
+                }`}
+              >
+                {isDarkMode ? 'light_mode' : 'dark_mode'}
+              </span>
+              <span className="text-[12px] font-bold hidden sm:inline">
+                {isDarkMode
+                  ? language === 'mr'
+                    ? 'लाइट'
+                    : language === 'en'
+                    ? 'Light'
+                    : 'लाइट'
+                  : language === 'mr'
+                  ? 'डार्क'
+                  : language === 'en'
+                  ? 'Dark'
+                  : 'डार्क'}
+              </span>
+            </button>
+
             {/* Audio Readout Pill */}
             <button
               id="btn-header-voice"
