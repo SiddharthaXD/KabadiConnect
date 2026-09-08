@@ -115,16 +115,16 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
 
   const handleShareReceipt = async () => {
     triggerHaptic(25);
-    const receiptText = `सौदा पक्का: ${transaction.txnNumber} | राशि: ₹${transaction.totalPayout.toLocaleString(
+    const receiptText = `{language === 'en' ? 'Deal Confirmed:' : language === 'mr' ? 'सौदा पक्का:' : 'सौदा पक्का:'} ${transaction.txnNumber} | {language === 'en' ? 'Amount:' : language === 'mr' ? 'रक्कम:' : 'राशि:'} ₹${transaction.totalPayout.toLocaleString(
       'en-IN'
-    )} (${transaction.weightKg} KG ${transaction.scrapItem.nameHi}) रिसाइक्लर: ${
+    )} (${transaction.weightKg} KG ${transaction.scrapItem.nameHi}) {language === 'en' ? 'Recycler:' : language === 'mr' ? 'रिसायकलर:' : 'रिसाइक्लर:'} ${
       transaction.recycler.nameHi
     }`;
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
-          title: 'SmartKabadi रसीद',
+          title: language === 'en' ? 'SmartKabadi Receipt' : language === 'mr' ? 'SmartKabadi पावती' : 'SmartKabadi रसीद',
           text: receiptText,
           url: window.location.href,
         });
@@ -161,7 +161,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
 
         {/* Headline */}
         <h2 className="text-[26px] font-black text-[#006948] tracking-tight mb-0.5">
-          सौदा पक्का!
+          {language === 'en' ? 'Deal Confirmed!' : language === 'mr' ? 'सौदा पक्का!' : 'सौदा पक्का!'}
         </h2>
         <p className="text-[17px] font-extrabold text-[#565e74]">Deal Logged Successfully</p>
 
@@ -173,7 +173,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
           <span className="text-[13px] font-bold text-[#191c1e] font-['Space_Grotesk']">
             {transaction.txnNumber}
           </span>
-          <span className="text-[12px] text-[#565e74]">| आज, 3:45 PM</span>
+          <span className="text-[12px] text-[#565e74]">| {language === 'en' ? 'Today, 3:45 PM' : language === 'mr' ? 'आज, 3:45 PM' : 'आज, 3:45 PM'}</span>
         </div>
       </div>
 
@@ -186,11 +186,11 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#b15f00] animate-pulse" />
             <span className="text-[13px] font-bold text-[#2f1500]">
-              ऑफ़लाइन सेव हुआ (Saved Locally)
+              {language === 'en' ? 'Saved Locally' : language === 'mr' ? 'ऑफलाइन सेव्ह झाले' : 'ऑफ़लाइन सेव हुआ (Saved Locally)'}
             </span>
           </div>
           <p className="text-[11px] text-[#6e3900] leading-tight mt-0.5 font-medium">
-            नेटवर्क आते ही मुख्य लेजर में जुड़ जाएगा
+            {language === 'en' ? 'Will sync to ledger when online' : language === 'mr' ? 'नेटवर्क येताच मुख्य लेजरमध्ये जोडले जाईल' : 'नेटवर्क आते ही मुख्य लेजर में जुड़ जाएगा'}
           </p>
         </div>
       </div>
@@ -199,10 +199,10 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
       <div className="w-full bg-white rounded-xl p-4 flex flex-col items-center text-center shadow-md relative border-2 border-[#191c1e] z-10">
         <div className="w-full flex items-center justify-between mb-2">
           <span className="text-[13px] font-bold text-[#565e74] uppercase tracking-wider font-['Space_Grotesk']">
-            डिजिटल हैंडओवर पास
+            {language === 'en' ? 'Digital Handover Pass' : language === 'mr' ? 'डिजिटल हँडओव्हर पास' : 'डिजिटल हैंडओवर पास'}
           </span>
           <span className="px-2 py-0.5 rounded-md bg-[#85f8c4] text-[#002114] text-[11px] font-bold flex items-center gap-1">
-            <span className="material-symbols-outlined text-[14px]">verified</span> सत्यापित
+            <span className="material-symbols-outlined text-[14px]">verified</span> {language === 'en' ? 'Verified' : language === 'mr' ? 'सत्यापित' : 'सत्यापित'}
           </span>
         </div>
 
@@ -269,7 +269,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
 
         {/* Scannable Prompt */}
         <p className="text-[17px] font-bold text-[#191c1e] mt-2">
-          रिसाइक्लर को यह कोड स्कैन करवाएं
+          {language === 'en' ? 'Scan this code at Recycler' : language === 'mr' ? 'रिसायकलरला हा कोड स्कॅन करायला सांगा' : 'रिसाइक्लर को यह कोड स्कैन करवाएं'}
         </p>
         <p className="text-[12px] text-[#565e74]">
           Show this QR code to the recycler to complete handover
@@ -286,7 +286,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
             volume_up
           </span>
           <span className="text-[13px] font-bold">
-            "कोड स्कैन कराएं और नकद/UPI लें"
+            "{language === 'en' ? 'Scan code and get Cash/UPI' : language === 'mr' ? 'कोड स्कॅन करा आणि रोख/UPI घ्या' : 'कोड स्कैन कराएं और नकद/UPI लें'}"
           </span>
         </button>
       </div>
@@ -294,7 +294,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
       {/* 4. Two-Way Visual Ledger Receipt (Split Cards) */}
       <div className="flex flex-col gap-2 z-10">
         <span className="text-[13px] font-bold text-[#565e74] uppercase tracking-wider px-1 font-['Space_Grotesk']">
-          लेन-देन विवरण (LEDGER SUMMARY)
+          {language === 'en' ? 'LEDGER SUMMARY' : language === 'mr' ? 'व्यवहार तपशील (LEDGER SUMMARY)' : 'लेन-देन विवरण (LEDGER SUMMARY)'}
         </span>
 
         {/* Top/Green: Incoming Payment Card */}
@@ -305,10 +305,10 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
             </div>
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1">
-                <span className="text-[11px] uppercase font-bold opacity-90">कबाड़ीवाला (YOU)</span>
+                <span className="text-[11px] uppercase font-bold opacity-90">{language === 'en' ? 'Collector (YOU)' : language === 'mr' ? 'कबाडीवाला (YOU)' : 'कबाड़ीवाला (YOU)'}</span>
                 <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
               </div>
-              <p className="text-[14px] font-bold truncate">नकद / UPI बिक्री राशि</p>
+              <p className="text-[14px] font-bold truncate">{language === 'en' ? 'Cash / UPI Sale Amount' : language === 'mr' ? 'रोख / UPI विक्री रक्कम' : 'नकद / UPI बिक्री राशि'}</p>
             </div>
           </div>
 
@@ -317,7 +317,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
               ₹{transaction.totalPayout.toLocaleString('en-IN')}
             </div>
             <span className="text-[11px] text-[#85f8c4] font-bold bg-[#002114]/40 px-2 py-0.5 rounded-full inline-block mt-1">
-              जमा (Payable)
+              {language === 'en' ? 'Payable' : language === 'mr' ? 'जमा (Payable)' : 'जमा (Payable)'}
             </span>
           </div>
         </div>
@@ -331,7 +331,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1">
                 <span className="text-[11px] text-[#5c647a] uppercase font-bold">
-                  रिसाइक्लर (HANDOVER)
+                  {language === 'en' ? 'Recycler' : language === 'mr' ? 'रिसायकलर (Handover)' : 'रिसाइक्लर (HANDOVER)'}
                 </span>
                 <span className="material-symbols-outlined text-[13px]">arrow_upward</span>
               </div>
@@ -347,7 +347,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
               <span className="text-[16px] font-bold">KG</span>
             </div>
             <span className="text-[11px] text-[#565e74] font-bold bg-white/70 px-2 py-0.5 rounded-full inline-block mt-1">
-              ई-कचरा वजन
+              {language === 'en' ? 'Weight' : language === 'mr' ? 'ई-कचरा वजन' : 'ई-कचरा वजन'}
             </span>
           </div>
         </div>
@@ -361,10 +361,10 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
           </div>
           <div className="flex flex-col min-w-0">
             <span className="text-[14px] font-bold text-[#191c1e] truncate">
-              {transaction.recycler.nameHi}
+              {language === 'mr' ? (transaction.recycler.nameMr || transaction.recycler.nameHi) : language === 'en' ? transaction.recycler.nameEn : transaction.recycler.nameHi}
             </span>
             <span className="text-[11px] text-[#565e74] truncate">
-              {transaction.recycler.addressHi} (कलेक्शन वैन #DL-8C-4091)
+              {language === 'mr' ? (transaction.recycler.addressMr || transaction.recycler.addressHi) : language === 'en' ? transaction.recycler.addressEn : transaction.recycler.addressHi} (कलेक्शन वैन #DL-8C-4091)
             </span>
           </div>
         </div>
@@ -392,7 +392,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
         >
           <span className="material-symbols-outlined text-[26px]">home</span>
           <span className="text-[17px] font-bold tracking-wide">
-            मुख्य स्क्रीन पर जाएं (Home)
+            {language === 'en' ? 'Go to Home' : language === 'mr' ? 'मुख्य स्क्रीनवर जा (Home)' : 'मुख्य स्क्रीन पर जाएं (Home)'}
           </span>
         </button>
 
@@ -405,7 +405,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
         >
           <span className="material-symbols-outlined text-[22px] text-[#006948]">share</span>
           <span className="text-[15px] font-bold">
-            रसीद शेयर करें (Share Slip / SMS)
+            {language === 'en' ? 'Share Receipt / SMS' : language === 'mr' ? 'पावती शेअर करा (Share Slip)' : 'रसीद शेयर करें (Share Slip / SMS)'}
           </span>
         </button>
       </div>

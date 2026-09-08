@@ -245,7 +245,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
           <div className="p-3 bg-[#f2f4f6] rounded-xl flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-[11px] text-[#565e74]">{rc.collectorLabel}</span>
-              <span className="text-[15px] font-bold text-[#191c1e]">रामेश्वर कबाड़ीवाला</span>
+              <span className="text-[15px] font-bold text-[#191c1e]">{language === 'en' ? 'Rameshwar Kabadiwala' : language === 'mr' ? 'रामेश्वर कबाडीवाला' : 'रामेश्वर कबाड़ीवाला'}</span>
               <span className="text-[12px] text-[#006948] font-bold mt-0.5">
                 {getItemName(scannedTxn.scrapItem)} ({scannedTxn.weightKg} KG)
               </span>
@@ -367,7 +367,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-[13px] font-bold text-[#191c1e] truncate">
-                  रामेश्वर कबाड़ीवाला (#DEL-9082)
+                  {language === 'en' ? 'Rameshwar Kabadiwala' : language === 'mr' ? 'रामेश्वर कबाडीवाला' : 'रामेश्वर कबाड़ीवाला'} (#DEL-9082)
                 </span>
                 <span className="text-[11px] text-[#565e74]">
                   {getItemName(SCRAP_ITEMS[0])} • 15.5 KG • 12 {rc.minsAway}
@@ -391,7 +391,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-[13px] font-bold text-[#191c1e] truncate">
-                  मोहन लाल स्क्रैप (#DEL-7714)
+                  {language === 'en' ? 'Mohan Lal Scrap' : language === 'mr' ? 'मोहन लाल स्क्रॅप' : 'मोहन लाल स्क्रैप'} (#DEL-7714)
                 </span>
                 <span className="text-[11px] text-[#565e74]">
                   {getItemName(SCRAP_ITEMS[1])} • 8.2 KG • 24 {rc.minsAway}

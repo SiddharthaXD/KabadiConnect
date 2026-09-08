@@ -101,6 +101,29 @@ export interface DashboardTranslations {
     support: string;
   };
 
+  // Weighing Screen
+  weighingScreen: {
+    headerTitle: string;
+    mandiRateStr: string;
+    chooseRecycler: string;
+    availableBuyers: string;
+    govtAuthorized: string;
+    kmAway: string;
+    offerRate: string;
+    perKg: string;
+    scaleWeight: string;
+    maxCapacity: string;
+    quickPresets: string;
+    totalPayout: string;
+    instantPaymentNote: string;
+    pickupIn: string;
+    changeBtn: string;
+    eWastePass: string;
+    environmentalImpact: string;
+    finalPayout: string;
+    confirmHandover: string;
+  };
+
   // Offline / Online Toast notifications
   offlineToast: {
     title: string;
@@ -118,12 +141,12 @@ export interface DashboardTranslations {
 export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
   hi: {
     appName: 'SmartKabadi',
-    langSwitchTitle: 'भाषा बदलें (Select Language)',
+    langSwitchTitle: 'भाषा चुनें',
     kabadiwalaRoleName: 'कबाड़ीवाला',
-    recyclerRoleName: 'रीसाइक्लर',
+    recyclerRoleName: 'रिसाइक्लर',
     switchRoleBtn: 'भूमिका बदलें',
     verifiedPartner: 'सत्यापित साथी',
-    cpcbAuthorized: 'CPCB अधिकृत रिसाइक्लर',
+    cpcbAuthorized: 'CPCB अधिकृत',
     syncNow: 'सिंक करें',
     syncedSuccess: 'सारा रिकॉर्ड सफलतापूर्वक सिंक हो गया है।',
     syncing: 'सिंक हो रहा है...',
@@ -215,6 +238,28 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       support: 'मदद',
     },
 
+    weighingScreen: {
+      headerTitle: 'हैंडओवर एवं वजन दर्ज करें',
+      mandiRateStr: 'मंडी भाव',
+      chooseRecycler: 'नजदीकी रिसाइक्लर चुनें',
+      availableBuyers: '2 उपलब्ध खरीदार',
+      govtAuthorized: 'अधिकृत खरीदार (Govt. Authorized)',
+      kmAway: 'KM दूर',
+      offerRate: 'ऑफर भाव',
+      perKg: 'प्रति किलो',
+      scaleWeight: 'सटीक वजन भरें (Scale Weight)',
+      maxCapacity: 'अधिकतम 40 KG क्षमता',
+      quickPresets: 'त्वरित वजन चयन (Quick Presets)',
+      totalPayout: 'कुल मिलने वाली रकम (TOTAL PAYOUT)',
+      instantPaymentNote: 'कांटा और ग्रेड सत्यापन के बाद तत्काल भुगतान सुनिश्चित',
+      pickupIn: 'पिकअप वैन X मिनट में उपलब्ध',
+      changeBtn: 'बदलें',
+      eWastePass: 'पर्यावरण साथी प्रमाण (E-Waste Pass)',
+      environmentalImpact: 'इस हैंडओवर से 2.3 किलो हानिकारक भारी धातुएं सुरक्षित निस्तारित होंगी।',
+      finalPayout: 'कुल बिक्री मूल्य (Final Payout)',
+      confirmHandover: 'डील पक्की करें & हैंडओवर',
+    },
+
     offlineToast: {
       title: 'आप ऑफ़लाइन हैं (Offline)',
       desc: 'इंटरनेट कनेक्शन कट गया है। आपका डेटा (वजन, सौदे और रसीदें) फोन में सुरक्षित रहेगा और कनेक्शन वापस आते ही अपने आप सिंक हो जाएगा।',
@@ -235,38 +280,38 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     kabadiwalaRoleName: 'Kabadiwala',
     recyclerRoleName: 'Recycler',
     switchRoleBtn: 'Switch Role',
-    verifiedPartner: 'Verified Collector',
-    cpcbAuthorized: 'CPCB Authorized Recycler',
-    syncNow: 'Sync Data',
-    syncedSuccess: 'All records have been synchronized successfully.',
-    syncing: 'Syncing records...',
+    verifiedPartner: 'Verified Partner',
+    cpcbAuthorized: 'CPCB Authorized',
+    syncNow: 'Sync Now',
+    syncedSuccess: 'All records synced successfully.',
+    syncing: 'Syncing...',
 
     globalSpeech: {
-      photoCapturedProcessing: 'Photo captured. Verifying details.',
-      cameraInstruction: 'Hold electronic scrap in front of camera and tap take photo.',
+      photoCapturedProcessing: 'Photo captured. Processing scrap details.',
+      cameraInstruction: 'Place e-waste in front of the camera and say take photo.',
       supportCallingMsg: 'Calling E-waste safety helpline.',
-      dataResetMsg: 'App data has been reset successfully.',
+      dataResetMsg: 'App data has been successfully reset.',
       receiptCopiedMsg: 'Receipt details copied to clipboard.',
     },
 
     kabadiwala: {
-      pageTitle: 'SmartKabadi - Collector Dashboard',
-      greeting: 'Welcome back, Rameshwar! Start today’s scrap collection',
-      voiceBannerTitle: 'Audio Assistance',
+      pageTitle: 'SmartKabadi - Kabadiwala Dashboard',
+      greeting: "Hello, Rameshwar! Start today's scrap business",
+      voiceBannerTitle: 'Listen via Voice',
       voiceBannerSubtitle: 'Tap to hear app instructions and live mandi rates',
       speakBtn: 'Listen',
       audioWelcomePrompt:
-        'Welcome to SmartKabadi. Tap the large green camera button to scan scrap and check government mandi rates instantly.',
+        'Welcome to SmartKabadi. Press the big green camera button to scan scrap and get live government rates.',
       offlineModeTitle: 'Offline Mode Protected',
-      offlineModeDesc: 'Weighing logs and receipts are saved even without internet',
+      offlineModeDesc: 'Weights and receipts are saved locally even without internet',
       syncPendingBtn: 'Sync Now',
-      scanCtaTitle: 'Scan Scrap Item',
+      scanCtaTitle: 'Scan E-Waste',
       scanCtaSubtitle: 'Use AI camera to identify e-waste, verify grade and check price',
-      scanCtaBadge: 'AI Live',
-      scanCtaAction: 'Launch Scanner',
-      earningsTitle: 'Today’s Earnings',
+      scanCtaBadge: 'Camera Live',
+      scanCtaAction: 'Start Scanning',
+      earningsTitle: 'Total Earnings Today',
       earningsSubtitle: 'Direct bank / Cash received',
-      weightTitle: 'Total Weight',
+      weightTitle: 'Total Weight Today',
       weightSubtitle: 'Verified via digital scale',
       dealsTitle: 'Completed Deals',
       dealsSubtitle: 'Verified transaction receipts',
@@ -275,87 +320,109 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       calcSubtitle: 'Adjust weight slider to instantly calculate scrap value',
       weightLabel: 'Weight (KG)',
       ratePerKgLabel: 'Selling Rate/KG',
-      calcCostLabel: 'My Cost/KG',
-      calcProfitLabel: 'Est. Profit',
-      estPayoutLabel: 'Estimated Total Payout',
-      weighThisNowBtn: 'Proceed to Weighing Scale',
-      presetQuickWeights: 'Quick presets:',
-      mandiRatesTitle: 'Official Mandi Scrap Rates',
+      calcCostLabel: 'My Cost Rate',
+      calcProfitLabel: 'Estimated Profit',
+      estPayoutLabel: 'Est. Total Payout',
+      weighThisNowBtn: 'Weigh on Scale',
+      presetQuickWeights: 'Quick Weights:',
+      mandiRatesTitle: 'Live Government Benchmark',
       mandiRatesSubtitle: 'Daily certified government scrap benchmark rates',
-      listenAllRatesBtn: 'Listen to All Rates via Audio',
-      tapToWeigh: 'Select for Weighing',
+      listenAllRatesBtn: 'Listen to all rates via Audio',
+      tapToWeigh: 'Tap to Weigh',
       audioRatesSpeech:
-        'Today live rates: Printed Circuit Board 280 rupees per kg, Stripped Copper Wire 540 rupees per kg, Lithium-ion battery 120 rupees per kg.',
-      cpcbNotice: '100% compliant with Central Pollution Control Board E-Waste Rules 2022.',
+        'Today\'s live market rates: PCB Motherboard 280 Rupees per KG, Copper Wire 540 Rupees per KG, Lithium Battery 120 Rupees per KG.',
+      cpcbNotice: '100% Certified legal disposal under CPCB E-Waste Rules 2022.',
     },
 
     recycler: {
-      pageTitle: 'SmartKabadi - Recycler Intake Portal',
-      intakeCenterActive: 'Intake Center Open',
+      pageTitle: 'SmartKabadi - Recycler Portal',
+      intakeCenterActive: 'Intake Center Active',
       totalProcuredTitle: 'Total Procured',
       totalProcuredSubtitle: 'E-Waste Inflow Volume',
       totalDisbursedTitle: 'Total Disbursed',
       totalDisbursedSubtitle: 'Cash & UPI Disbursed',
       verifiedTokensTitle: 'Verified Tokens',
       verifiedTokensSubtitle: 'CPCB Certified Handovers',
-      scanPassHeader: 'INTAKE COUNTER & INSPECTION',
-      scanPassTitle: 'Scan Collector QR Token',
-      scanPassDesc: 'Scan digital QR handover pass from collector to verify material and release payout',
-      scanPassAction: 'Scan Collector QR Code',
-      scanningAction: 'Scanning QR Token...',
-      validTokenFound: 'Valid Token Verified',
+      scanPassHeader: 'COLLECTION COUNTER',
+      scanPassTitle: 'Scan Kabadiwala Token',
+      scanPassDesc: 'Scan digital QR pass from kabadiwala\'s phone to accept scrap',
+      scanPassAction: 'Scan QR Pass',
+      scanningAction: 'Scanning QR...',
+      validTokenFound: 'Valid Token Found',
       collectorLabel: 'Collector',
-      payoutDueLabel: 'Payable Amount',
-      acceptPayBtn: 'Accept & Disburse Payment',
-      cancelBtn: 'Dismiss',
-      ratesManagerTitle: 'Your Mandi Buying Rates',
+      payoutDueLabel: 'Payout Due',
+      acceptPayBtn: 'Accept & Mark Paid',
+      cancelBtn: 'Cancel',
+      ratesManagerTitle: 'Your Live Purchase Rates',
       ratesManagerSubtitle: 'Set live benchmark purchase rates for local collectors',
-      govtBaseRateLabel: 'Official Base Rate:',
-      rateUpdatedSuccess: 'new buying rate saved!',
-      incomingVansTitle: 'Inbound Scrap Vans Queue',
-      activePickupsCount: 'Active Vans',
+      govtBaseRateLabel: 'Govt Base Rate:',
+      rateUpdatedSuccess: 'rate updated successfully!',
+      incomingVansTitle: 'Incoming Scrap Vans',
+      activePickupsCount: 'Active Pickups',
       minsAway: 'mins away',
-      callCollector: 'Call Collector',
+      callCollector: 'Call',
       audioWelcomePrompt:
-        'Welcome to the Authorized Recycler Portal. Scan collector QR tokens and manage your live buying prices.',
-      audioScanInstruction: 'Hold the collector QR code steady in front of the camera.',
+        'Welcome to the Recycler Portal. Scan kabadiwala QR codes and set live purchase rates.',
+      audioScanInstruction: 'Hold the kabadiwala QR code properly in front of the camera.',
     },
 
     nav: {
       home: 'Home',
       portal: 'Portal',
       ledger: 'Ledger',
-      support: 'Support',
+      support: 'Help',
+    },
+
+    weighingScreen: {
+      headerTitle: 'Record Weight & Handover',
+      mandiRateStr: 'Market Rate',
+      chooseRecycler: 'Choose Nearby Recycler',
+      availableBuyers: '2 Buyers Available',
+      govtAuthorized: 'Govt. Authorized',
+      kmAway: 'KM Away',
+      offerRate: 'Offer Rate',
+      perKg: 'per KG',
+      scaleWeight: 'Enter Scale Weight',
+      maxCapacity: 'Max 40 KG Capacity',
+      quickPresets: 'Quick Presets',
+      totalPayout: 'TOTAL PAYOUT',
+      instantPaymentNote: 'Instant payment assured after scale and grade verification',
+      pickupIn: 'Pickup van available in X mins',
+      changeBtn: 'Change',
+      eWastePass: 'E-Waste Pass',
+      environmentalImpact: 'This handover will safely dispose of 2.3 kg of hazardous heavy metals.',
+      finalPayout: 'Final Payout',
+      confirmHandover: 'Confirm Deal & Handover',
     },
 
     offlineToast: {
       title: 'You are Offline',
-      desc: 'Internet connection lost. Don’t worry, your weighing logs, receipts, and deals are safely stored locally and will automatically sync once the connection is restored.',
+      desc: 'Internet connection is lost. Don\'t worry, your weight logs and receipts are safely saved on the phone and will sync automatically when online.',
       warningBadge: 'Offline Protection Active',
       listenBtn: 'Listen',
-      dismissBtn: 'Got it',
-      recheckBtn: 'Check Status',
+      dismissBtn: 'OK',
+      recheckBtn: 'Recheck',
       speechText:
-        'Warning: You are currently offline. Your data is safely saved on this device and will automatically synchronize once your connection is restored.',
+        'Attention: You are currently offline. All your data is safely saved on your phone and will automatically sync once the internet is restored.',
       onlineRestoredTitle: 'Back Online!',
-      onlineRestoredDesc: 'Connection restored. Synchronizing your offline records now...',
+      onlineRestoredDesc: 'Internet is restored. Syncing all records...',
     },
   },
 
   mr: {
     appName: 'SmartKabadi',
-    langSwitchTitle: 'भाषा निवडा (Select Language)',
+    langSwitchTitle: 'भाषा निवडा',
     kabadiwalaRoleName: 'कबाडीवाला',
     recyclerRoleName: 'रिसायकलर',
     switchRoleBtn: 'भूमिका बदला',
-    verifiedPartner: 'प्रमाणित संकलक',
-    cpcbAuthorized: 'CPCB अधिकृत रिसायकलर',
+    verifiedPartner: 'सत्यापित साथी',
+    cpcbAuthorized: 'CPCB अधिकृत',
     syncNow: 'सिंक करा',
-    syncedSuccess: 'सर्व नोंदी यशस्वीरित्या सिंक झाल्या आहेत.',
+    syncedSuccess: 'सर्व रेकॉर्ड यशस्वीरित्या सिंक झाले आहेत.',
     syncing: 'सिंक होत आहे...',
 
     globalSpeech: {
-      photoCapturedProcessing: 'फोटो काढला आहे. तपशील तपासले जात आहेत.',
+      photoCapturedProcessing: 'फोटो काढला आहे. तपशील तपासला जात आहे.',
       cameraInstruction: 'कॅमेऱ्यासमोर ई-कचरा किंवा मदरबोर्ड धरा आणि फोटो काढा.',
       supportCallingMsg: 'ई-कचरा सुरक्षा हेल्पलाइनला कॉल करत आहे.',
       dataResetMsg: 'ॲप डेटा यशस्वीरित्या रीसेट केला आहे.',
@@ -407,7 +474,7 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       intakeCenterActive: 'खरेदी केंद्र सुरू आहे',
       totalProcuredTitle: 'एकूण खरेदी (Procured)',
       totalProcuredSubtitle: 'ई-कचरा आवक प्रमाण',
-      totalDisbursedTitle: 'वाटप केलेली रक्कम (Disbursed)',
+      totalDisbursedTitle: 'वाटप केलेली रक्कम (Disbursed)',      
       totalDisbursedSubtitle: 'रोख व UPI देयके',
       verifiedTokensTitle: 'प्रमाणित टोकन',
       verifiedTokensSubtitle: 'CPCB संमत व्यवहार',
@@ -439,6 +506,28 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       portal: 'पोर्टल',
       ledger: 'खातेवही',
       support: 'मदत',
+    },
+
+    weighingScreen: {
+      headerTitle: 'हँडओव्हर आणि वजन नोंदवा',
+      mandiRateStr: 'बाजार भाव',
+      chooseRecycler: 'जवळचा रिसायकलर निवडा',
+      availableBuyers: '२ खरेदीदार उपलब्ध',
+      govtAuthorized: 'अधिकृत खरेदीदार (Govt. Authorized)',
+      kmAway: 'KM दूर',
+      offerRate: 'ऑफर दर',
+      perKg: 'प्रति किलो',
+      scaleWeight: 'अचूक वजन भरा (Scale Weight)',
+      maxCapacity: 'कमाल ४० KG क्षमता',
+      quickPresets: 'झटपट वजन निवड (Quick Presets)',
+      totalPayout: 'एकूण मिळणारी रक्कम (TOTAL PAYOUT)',
+      instantPaymentNote: 'काटा आणि ग्रेड पडताळणीनंतर त्वरित पेमेंटची खात्री',
+      pickupIn: 'पिकअप व्हॅन X मिनिटांत उपलब्ध',
+      changeBtn: 'बदला',
+      eWastePass: 'पर्यावरण साथी प्रमाण (E-Waste Pass)',
+      environmentalImpact: 'या हँडओव्हरमुळे २.३ किलो हानिकारक जड धातूंची सुरक्षित विल्हेवाट लावली जाईल.',
+      finalPayout: 'एकूण विक्री मूल्य (Final Payout)',
+      confirmHandover: 'डील पक्की करा & हँडओव्हर',
     },
 
     offlineToast: {

@@ -46,12 +46,12 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
           </div>
           <div className="flex flex-col">
             <span className="text-[12px] font-bold text-[#6e3900] uppercase">
-              CPCB प्रमाणित ई-कचरा सहायता
+              {language === 'en' ? 'CPCB Certified E-Waste Support' : language === 'mr' ? 'CPCB प्रमाणित ई-कचरा मदत' : 'CPCB प्रमाणित ई-कचरा सहायता'}
             </span>
             <h3 className="text-[18px] font-black text-[#2f1500] leading-tight">
-              {isRecycler ? 'रीसाइक्लर सहायता केंद्र' : 'कबाड़ीवाला सहायता केंद्र'}
+              {isRecycler ? (language === 'en' ? 'Recycler Support Center' : language === 'mr' ? 'रिसायकलर मदत केंद्र' : 'रीसाइक्लर सहायता केंद्र') : (language === 'en' ? 'Collector Support Center' : language === 'mr' ? 'कबाडीवाला मदत केंद्र' : 'कबाड़ीवाला सहायता केंद्र')}
             </h3>
-            <span className="text-[12px] text-[#565e74]">टोल-फ्री नंबर: 1800-123-4567</span>
+            <span className="text-[12px] text-[#565e74]">{language === 'en' ? 'Toll-Free Number:' : language === 'mr' ? 'टोल-फ्री क्रमांक:' : 'टोल-फ्री नंबर:'} 1800-123-4567</span>
           </div>
         </div>
 
@@ -61,14 +61,14 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
             className="flex-1 h-11 bg-[#2f1500] text-[#ffdcc3] rounded-xl font-bold text-[14px] flex items-center justify-center gap-1.5 active:scale-95 shadow-sm"
           >
             <span className="material-symbols-outlined text-[20px]">phone</span>
-            <span>कॉल करें (Call Now)</span>
+            <span>{language === 'en' ? 'Call Now' : language === 'mr' ? 'कॉल करा (Call)' : 'कॉल करें (Call Now)'}</span>
           </button>
           <button
             onClick={handleReadSafety}
             className="h-11 px-3 bg-white text-[#2f1500] rounded-xl font-bold text-[13px] flex items-center gap-1 active:scale-95 border border-[#8d4b00]/30 shadow-sm"
           >
             <span className="material-symbols-outlined text-[18px] text-[#8d4b00]">volume_up</span>
-            <span>नियम सुनें</span>
+            <span>{language === 'en' ? 'Listen to Rules' : language === 'mr' ? 'नियम ऐका' : 'नियम सुनें'}</span>
           </button>
         </div>
       </div>
@@ -77,7 +77,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
       <div className="bg-white rounded-xl p-4 shadow-sm border-2 border-[#191c1e] flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <span className="text-[13px] font-bold text-[#565e74] uppercase font-['Space_Grotesk']">
-            {isRecycler ? 'रीसाइक्लर प्रोफ़ाइल' : 'संग्राहक प्रोफ़ाइल (COLLECTOR ID)'}
+            {isRecycler ? (language === 'en' ? 'Recycler Profile' : language === 'mr' ? 'रिसायकलर प्रोफाइल' : 'रीसाइक्लर प्रोफ़ाइल') : (language === 'en' ? 'Collector Profile' : language === 'mr' ? 'कबाडीवाला प्रोफाइल (COLLECTOR ID)' : 'संग्राहक प्रोफ़ाइल (COLLECTOR ID)')}
           </span>
           <span
             className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
@@ -86,7 +86,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
                 : 'bg-[#85f8c4] text-[#002114]'
             }`}
           >
-            {userProfile?.verifiedBadge || (isRecycler ? 'CPCB अधिकृत' : 'सत्यापित साथी')}
+            {userProfile?.verifiedBadge || (isRecycler ? (language === 'en' ? 'CPCB Authorized' : language === 'mr' ? 'CPCB अधिकृत' : 'CPCB अधिकृत') : (language === 'en' ? 'Verified Partner' : language === 'mr' ? 'सत्यापित साथी' : 'सत्यापित साथी'))}
           </span>
         </div>
 
@@ -97,7 +97,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
             </div>
             <div className="flex flex-col min-w-0">
               <span className="text-[16px] font-bold text-[#191c1e] truncate">
-                {userProfile?.name || (isRecycler ? 'राजेश शर्मा' : 'रामेश्वर कबाड़ीवाला')}
+                {userProfile?.name || (isRecycler ? language === 'en' ? 'Rajesh Sharma' : language === 'mr' ? 'राजेश शर्मा' : 'राजेश शर्मा' : language === 'en' ? 'Rameshwar Kabadiwala' : language === 'mr' ? 'रामेश्वर कबाडीवाला' : 'रामेश्वर कबाड़ीवाला')}
               </span>
               <span className="text-[12px] text-[#565e74] truncate">
                 {userProfile?.businessName}
@@ -114,7 +114,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
               className="px-3 py-2 rounded-xl bg-[#f2f4f6] hover:bg-[#85f8c4]/40 text-[#006948] font-bold text-[12px] flex items-center gap-1 border border-[#bccac0]/50 active:scale-95 shrink-0 transition-colors"
             >
               <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
-              <span>बदलें</span>
+              <span>{language === 'en' ? 'Change' : language === 'mr' ? 'बदला' : 'बदलें'}</span>
             </button>
           )}
         </div>
@@ -126,7 +126,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
           <span className="material-symbols-outlined text-[#ba1a1a] text-[20px]">
             health_and_safety
           </span>
-          3 स्वर्ण सुरक्षा नियम (Golden Rules)
+          {language === 'en' ? '3 Golden Safety Rules' : language === 'mr' ? '3 सुवर्ण सुरक्षा नियम (Golden Rules)' : '3 स्वर्ण सुरक्षा नियम (Golden Rules)'}
         </h4>
 
         <div className="space-y-2 mt-1">
@@ -135,7 +135,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
               1
             </span>
             <span>
-              <strong>बैटरी को अलग रखें:</strong> मोबाइल व लैपटॉप की फूली हुई बैटरियों को धातु के बक्से या प्लास्टिक थैले में अलग रखें।
+              <strong>{language === 'en' ? 'Keep Batteries Separate:' : language === 'mr' ? 'बॅटरी वेगळी ठेवा:' : 'बैटरी को अलग रखें:'}</strong> {language === 'en' ? 'Keep swollen mobile/laptop batteries in a separate metal or plastic box.' : language === 'mr' ? 'मोबाईल आणि लॅपटॉपच्या फुगलेल्या बॅटरी धातूच्या किंवा प्लास्टिकच्या पेटीत वेगळ्या ठेवा.' : 'मोबाइल व लैपटॉप की फूली हुई बैटरियों को धातु के बक्से या प्लास्टिक थैले में अलग रखें।'}
             </span>
           </div>
 
@@ -144,7 +144,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
               2
             </span>
             <span>
-              <strong>दस्ताने व चश्मा:</strong> सीआरटी टीवी, स्क्रीन या सर्किट बोर्ड तोड़ते समय भारी रबर दस्ताने पहनें।
+              <strong>{language === 'en' ? 'Gloves & Glasses:' : language === 'mr' ? 'हातमोजे व चष्मा:' : 'दस्ताने व चश्मा:'}</strong> {language === 'en' ? 'Wear heavy rubber gloves when breaking CRT TVs, screens, or circuit boards.' : language === 'mr' ? 'सीआरटी टीव्ही, स्क्रीन किंवा सर्किट बोर्ड तोडताना जाड रबरी हातमोजे घाला.' : 'सीआरटी टीवी, स्क्रीन या सर्किट बोर्ड तोड़ते समय भारी रबर दस्ताने पहनें।'}
             </span>
           </div>
 
@@ -153,7 +153,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
               3
             </span>
             <span>
-              <strong>अधिकृत केंद्रों पर हैंडओवर:</strong> बिना लाइसेंस वाले भट्टी वालों को न बेचें, केवल CPCB प्रमाणित रिसाइक्लर से डील पक्की करें।
+              <strong>{language === 'en' ? 'Authorized Handover:' : language === 'mr' ? 'अधिकृत केंद्रांवर हँडओव्हर:' : 'अधिकृत केंद्रों पर हैंडओवर:'}</strong> {language === 'en' ? 'Do not sell to unlicensed smelters, only deal with CPCB certified recyclers.' : language === 'mr' ? 'परवाना नसलेल्या भट्टीवाल्यांना विकू नका, केवळ CPCB प्रमाणित रिसायकलर सोबतच व्यवहार करा.' : 'बिना लाइसेंस वाले भट्टी वालों को न बेचें, केवल CPCB प्रमाणित रिसाइक्लर से डील पक्की करें।'}
             </span>
           </div>
         </div>
@@ -170,7 +170,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
           className="w-full h-11 bg-[#eceef0] text-[#565e74] hover:text-[#ba1a1a] rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 active:scale-95 border border-[#bccac0]/40 transition-colors"
         >
           <span className="material-symbols-outlined text-[16px]">restart_alt</span>
-          <span>डेमो डेटा रीसेट करें (Reset Sample Deals)</span>
+          <span>{language === 'en' ? 'Reset Sample Deals' : language === 'mr' ? 'डेमो डेटा रीसेट करा (Reset Sample Deals)' : 'डेमो डेटा रीसेट करें (Reset Sample Deals)'}</span>
         </button>
       </div>
     </div>

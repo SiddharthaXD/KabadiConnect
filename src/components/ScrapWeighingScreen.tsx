@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ScrapItem, Recycler, Language } from '../types';
 import { RECYCLERS, WEIGHING_PCB_IMG } from '../data/scrapData';
 import { speakVernacular, triggerHaptic } from '../utils/speech';
+import { TRANSLATIONS } from '../data/translations';
 
 interface ScrapWeighingScreenProps {
   item: ScrapItem;
@@ -19,6 +20,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
   const [weight, setWeight] = useState<number>(initialWeight);
   const [selectedRecycler, setSelectedRecycler] = useState<Recycler>(RECYCLERS[0]);
   const maxWeight = 40.0;
+  const t = TRANSLATIONS[language].weighingScreen;
 
   const currentRate = selectedRecycler.offerRate || item.baseRate;
   const totalPayout = Math.round(weight * currentRate);
@@ -42,7 +44,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
     setSelectedRecycler(rec);
     speakVernacular(
       language === 'mr'
-        ? `${rec.nameMr || rec.nameHi} निवडले - दर ₹${rec.offerRate} प्रति किलो लागू होईल.`
+        ? `${rec.nameMr || rec.nameHi} निवडले - दर ₹${rec.offerRate} {t.perKg} लागू होईल.`
         : language === 'en'
         ? `Selected ${rec.nameEn} with rate ₹${rec.offerRate} per kg.`
         : `${rec.nameHi} को चुना गया - भाव ₹${rec.offerRate} प्रति किलो लागू होगा।`,
@@ -57,7 +59,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
         ? 'काट्याचे वजन नोंदवा किंवा प्रीसेट बटण दाबा. खाली एकूण रक्कम दिसेल.'
         : language === 'en'
         ? 'Enter scale weight or select a preset. Total payout is shown below.'
-        : 'कांटे का वजन दर्ज करें या प्रीसेट बटन दबाएं। नीचे कुल रकम दिखाई देगी।',
+        : 'कांटे का {t.scaleWeight} या प्रीसेट बटन दबाएं। नीचे कुल रकम दिखाई देगी।',
       language
     );
   };
@@ -80,7 +82,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#006948] animate-pulse" />
           <span className="text-[12px] font-bold text-[#191c1e]">
-            लाइव मंडी भाव अपडेटेड (Live Rates Active)
+            लाइव {t.mandiRateStr} अपडेटेड (Live Rates Active)
           </span>
         </div>
         <span className="text-[12px] font-semibold text-[#565e74]">ओखला जोन (Okhla)</span>
@@ -92,7 +94,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
           <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-[#006948]/10 shrink-0 border border-[#bccac0]/40">
             <img
               src={item.imageUrl || WEIGHING_PCB_IMG}
-              alt={item.nameHi}
+              alt={language === 'mr' ? (item.nameMr || item.nameHi) : language === 'en' ? item.nameEn : item.nameHi}
               className="w-full h-full object-cover"
             />
             <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-[#006948] flex items-center justify-center text-white">
@@ -115,7 +117,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
                       ? `${item.nameMr || item.nameHi}, अंदाजे सरकारी दर ₹${item.marketMinRate} ते ₹${item.marketMaxRate} प्रति किलो.`
                       : language === 'en'
                       ? `${item.nameEn}, estimated government rate ₹${item.marketMinRate} to ₹${item.marketMaxRate} per kg.`
-                      : `${item.nameHi}, अनुमानित सरकारी दर ₹${item.marketMinRate} से ₹${item.marketMaxRate} प्रति किलो।`,
+                      : `${language === 'mr' ? (item.nameMr || item.nameHi) : language === 'en' ? item.nameEn : item.nameHi}, अनुमानित सरकारी दर ₹${item.marketMinRate} से ₹${item.marketMaxRate} प्रति किलो।`,
                     language
                   );
                 }}
@@ -124,12 +126,12 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
                 <span className="material-symbols-outlined text-[#8d4b00] text-[16px]">
                   volume_up
                 </span>
-                <span className="text-[11px] font-bold">सुनो</span>
+                <span className="text-[11px] font-bold">{language === 'en' ? 'Listen' : language === 'mr' ? 'ऐका' : 'सुनो'}</span>
               </button>
             </div>
 
             <h2 className="text-[16px] font-bold text-[#191c1e] truncate leading-tight">
-              {item.nameHi}
+              {language === 'mr' ? (item.nameMr || item.nameHi) : language === 'en' ? item.nameEn : item.nameHi}
             </h2>
             <p className="text-[12px] text-[#565e74] truncate">{item.categoryHi}</p>
           </div>
@@ -157,9 +159,9 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
       <div className="flex items-center justify-between px-1 pt-1">
         <div className="flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[#006948] text-[20px]">verified</span>
-          <h3 className="text-[15px] font-bold text-[#191c1e]">नजदीकी रिसाइक्लर चुनें</h3>
+          <h3 className="text-[15px] font-bold text-[#191c1e]">{t.chooseRecycler}</h3>
         </div>
-        <span className="text-[12px] font-bold text-[#565e74]">2 उपलब्ध खरीदार</span>
+        <span className="text-[12px] font-bold text-[#565e74]">{t.availableBuyers}</span>
       </div>
 
       {/* Recyclers List */}
@@ -176,16 +178,16 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
                 <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#006948] text-white text-[11px] font-bold">
                     <span className="material-symbols-outlined text-[13px]">verified</span>
-                    अधिकृत खरीदार (Govt. Authorized)
+                    {t.govtAuthorized}
                   </span>
                   <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#dae2fd] text-[#131b2e] text-[11px] font-bold">
                     <span className="material-symbols-outlined text-[13px]">location_on</span>
-                    {selectedRecycler.distanceKm} KM दूर
+                    {selectedRecycler.distanceKm} {t.kmAway}
                   </span>
                 </div>
 
                 <h4 className="text-[17px] font-bold text-[#191c1e] leading-tight truncate">
-                  {selectedRecycler.nameHi}
+                  {language === 'mr' ? (selectedRecycler.nameMr || selectedRecycler.nameHi) : language === 'en' ? selectedRecycler.nameEn : selectedRecycler.nameHi}
                 </h4>
                 <span className="text-[11px] text-[#565e74] truncate">
                   {selectedRecycler.nameEn} • CPCB ID: {selectedRecycler.cpcbId}
@@ -193,7 +195,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
               </div>
 
               <div className="flex flex-col items-end shrink-0 bg-[#85f8c4]/40 px-2.5 py-1 rounded-lg border border-[#006948]/20">
-                <span className="text-[10px] text-[#005137] font-bold uppercase">ऑफर भाव</span>
+                <span className="text-[10px] text-[#005137] font-bold uppercase">{t.offerRate}</span>
                 <span className="text-[22px] font-bold text-[#006948] font-['Space_Grotesk'] leading-none">
                   ₹{selectedRecycler.offerRate}
                 </span>
@@ -293,7 +295,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
                 </div>
                 <div className="flex justify-between text-[11px] font-medium text-[#565e74] px-0.5">
                   <span>0 KG</span>
-                  <span>अधिकतम 40 KG क्षमता</span>
+                  <span>{t.maxCapacity}</span>
                 </div>
               </div>
             </div>
@@ -301,7 +303,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
             {/* Quick Weight Preset Chips */}
             <div className="flex flex-col gap-1">
               <span className="text-[12px] font-semibold text-[#565e74]">
-                त्वरित वजन चयन (Quick Presets)
+                {t.quickPresets}
               </span>
               <div className="grid grid-cols-4 gap-2">
                 {[5, 10, 15.5, 25].map((preset) => (
@@ -325,7 +327,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
             <div className="flex flex-col p-3.5 rounded-xl bg-[#006948] text-white shadow-md border-2 border-[#002114]">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[12px] font-bold text-white/90 uppercase tracking-wider font-['Space_Grotesk']">
-                  कुल मिलने वाली रकम (TOTAL PAYOUT)
+                  {t.totalPayout}
                 </span>
                 <span className="material-symbols-outlined text-[20px] text-[#85f8c4]">paid</span>
               </div>
@@ -347,7 +349,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
               </div>
 
               <p className="text-[11px] text-white/80 mt-1">
-                कांटा और ग्रेड सत्यापन के बाद तत्काल भुगतान सुनिश्चित
+                {t.instantPaymentNote}
               </p>
             </div>
           </div>
@@ -364,34 +366,34 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
               <div className="flex flex-col flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="px-2 py-0.5 rounded-full bg-[#eceef0] text-[#3d4a42] text-[11px] font-bold">
-                    अधिकृत
+                    {t.govtAuthorized.split(' ')[0]}
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-[#e6e8ea] text-[#191c1e] text-[11px] font-bold">
-                    {altRecycler.distanceKm} KM दूर
+                    {altRecycler.distanceKm} {t.kmAway}
                   </span>
                 </div>
                 <h4 className="text-[15px] font-bold text-[#191c1e] truncate">
-                  {altRecycler.nameHi}
+                  {language === 'mr' ? (altRecycler.nameMr || altRecycler.nameHi) : language === 'en' ? altRecycler.nameEn : altRecycler.nameHi}
                 </h4>
                 <span className="text-[11px] text-[#565e74]">
-                  {altRecycler.addressHi} • {altRecycler.rating} ★ ({altRecycler.pickupsCount}+
-                  पिकअप)
+                  {language === 'mr' ? (altRecycler.addressMr || altRecycler.addressHi) : language === 'en' ? altRecycler.addressEn : altRecycler.addressHi} • {altRecycler.rating} ★ ({altRecycler.pickupsCount}+
+                  Pickups)
                 </span>
               </div>
 
               <div className="flex flex-col items-end shrink-0">
-                <span className="text-[11px] text-[#565e74]">रेट</span>
+                <span className="text-[11px] text-[#565e74]">{t.offerRate}</span>
                 <span className="text-[20px] font-bold text-[#191c1e] font-['Space_Grotesk']">
                   ₹{altRecycler.offerRate}
                 </span>
-                <span className="text-[11px] text-[#565e74]">/ KG</span>
+                <span className="text-[11px] text-[#565e74]">/ {t.perKg.split(' ')[1] || 'KG'}</span>
               </div>
             </div>
 
             <div className="mt-2 pt-2 border-t border-[#bccac0]/30 flex items-center justify-between text-[#565e74] text-[11px]">
-              <span>पिकअप वैन {altRecycler.vanArrivalMins} मिनट में उपलब्ध</span>
+              <span>{t.pickupIn.replace('X', altRecycler.vanArrivalMins.toString())}</span>
               <span className="text-[#006948] font-bold text-[13px] flex items-center">
-                बदलें <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                {t.changeBtn} <span className="material-symbols-outlined text-[16px]">chevron_right</span>
               </span>
             </div>
           </div>
@@ -405,10 +407,10 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
         </div>
         <div className="flex flex-col min-w-0">
           <h5 className="text-[14px] font-bold text-[#191c1e] truncate">
-            पर्यावरण साथी प्रमाण (E-Waste Pass)
+            {t.eWastePass}
           </h5>
           <p className="text-[12px] text-[#565e74]">
-            इस हैंडओवर से 2.3 किलो हानिकारक भारी धातुएं सुरक्षित निस्तारित होंगी।
+            {t.environmentalImpact}
           </p>
         </div>
       </div>
@@ -418,7 +420,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
         <div className="flex flex-col gap-1.5 max-w-md mx-auto w-full">
           <div className="flex items-center justify-between px-1">
             <span className="text-[12px] font-semibold text-[#565e74]">
-              कुल बिक्री मूल्य (Final Payout)
+              {t.finalPayout}
             </span>
             <span
               id="dock-payout-label"
@@ -436,7 +438,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
           >
             <span className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[24px]">handshake</span>
-              <span className="truncate">डील पक्की करें &amp; हैंडओवर</span>
+              <span className="truncate">{t.confirmHandover}</span>
             </span>
             <div className="flex items-center gap-1">
               <span className="text-[20px] font-bold font-['Space_Grotesk']">

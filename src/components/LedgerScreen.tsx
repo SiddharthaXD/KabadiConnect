@@ -51,21 +51,21 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
             <span className="material-symbols-outlined text-[24px] text-[#85f8c4]">
               receipt_long
             </span>
-            <span className="text-[17px] font-bold">कबाड़ खाता रजिस्टर</span>
+            <span className="text-[17px] font-bold">{language === 'en' ? 'Scrap Ledger Register' : language === 'mr' ? 'कबाड खाते रजिस्टर' : 'कबाड़ खाता रजिस्टर'}</span>
           </div>
           <button
             onClick={handleHearSummary}
             className="px-2.5 py-1 rounded-full bg-[#85f8c4] text-[#002114] text-[12px] font-bold flex items-center gap-1 active:scale-95 shadow-sm"
           >
             <span className="material-symbols-outlined text-[16px]">volume_up</span>
-            <span>सुनो</span>
+            <span>{language === 'en' ? 'Listen' : language === 'mr' ? 'ऐका' : 'सुनो'}</span>
           </button>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-white/20">
           <div>
             <span className="text-[11px] text-white/80 uppercase font-semibold">
-              कुल जमा रकम (Earnings)
+              {language === 'en' ? 'Total Earnings' : language === 'mr' ? 'एकूण जमा रक्कम (Earnings)' : 'कुल जमा रकम (Earnings)'}
             </span>
             <div className="text-[26px] font-bold font-['Space_Grotesk'] text-[#85f8c4] leading-tight">
               ₹{totalEarnings.toLocaleString('en-IN')}
@@ -73,7 +73,7 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
           </div>
           <div>
             <span className="text-[11px] text-white/80 uppercase font-semibold">
-              कुल स्क्रैप वजन (Weight)
+              {language === 'en' ? 'Total Scrap Weight' : language === 'mr' ? 'एकूण स्क्रॅप वजन (Weight)' : 'कुल स्क्रैप वजन (Weight)'}
             </span>
             <div className="text-[26px] font-bold font-['Space_Grotesk'] leading-tight">
               {totalWeight.toFixed(1)} <span className="text-[16px]">KG</span>
@@ -85,10 +85,10 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
       {/* Filter Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
         {[
-          { id: 'all', label: 'सभी (All)' },
-          { id: 'pcb', label: 'PCB मदरबोर्ड' },
-          { id: 'copper', label: 'तांबा (Copper)' },
-          { id: 'battery', label: 'बैटरी (Li-ion)' },
+          { id: 'all', label: language === 'en' ? 'All' : language === 'mr' ? 'सर्व (All)' : 'सभी (All)' },
+          { id: 'pcb', label: language === 'en' ? 'PCB Motherboard' : language === 'mr' ? 'PCB मदरबोर्ड' : 'PCB मदरबोर्ड' },
+          { id: 'copper', label: language === 'en' ? 'Copper' : language === 'mr' ? 'तांबे (Copper)' : 'तांबा (Copper)' },
+          { id: 'battery', label: language === 'en' ? 'Battery (Li-ion)' : language === 'mr' ? 'बॅटरी (Li-ion)' : 'बैटरी (Li-ion)' },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -110,7 +110,7 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
       {/* Sync Status strip */}
       <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#eceef0] border border-[#bccac0]/40">
         <span className="text-[12px] font-medium text-[#3d4a42]">
-          {transactions.filter((t) => !t.isSynced).length} अनसिंक्ड रिकॉर्ड
+          {transactions.filter((t) => !t.isSynced).length} {language === 'en' ? 'Unsynced Records' : language === 'mr' ? 'अनसिंक्ड रेकॉर्ड' : 'अनसिंक्ड रिकॉर्ड'}
         </span>
         <button
           onClick={onSync}
@@ -119,7 +119,7 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
           <span className={`material-symbols-outlined text-[15px] ${isSyncing ? 'animate-spin' : ''}`}>
             sync
           </span>
-          <span>{isSyncing ? 'सिंक हो रहा...' : 'अब सिंक करें'}</span>
+          <span>{isSyncing ? (language === 'en' ? 'Syncing...' : language === 'mr' ? 'सिंक होत आहे...' : 'सिंक हो रहा...') : (language === 'en' ? 'Sync Now' : language === 'mr' ? 'आता सिंक करा' : 'अब सिंक करें')}</span>
         </button>
       </div>
 
@@ -143,18 +143,18 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
               <div className="flex flex-col min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[14px] font-bold text-[#191c1e] truncate">
-                    {tx.scrapItem.nameHi}
+                    {language === 'mr' ? (tx.scrapItem.nameMr || tx.scrapItem.nameHi) : language === 'en' ? tx.scrapItem.nameEn : tx.scrapItem.nameHi}
                   </span>
                   <span
                     className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
                       tx.isSynced ? 'bg-[#85f8c4] text-[#002114]' : 'bg-[#ffdcc3] text-[#8d4b00]'
                     }`}
                   >
-                    {tx.isSynced ? 'सिंक' : 'लोकल'}
+                    {tx.isSynced ? (language === 'en' ? 'Synced' : language === 'mr' ? 'सिंक' : 'सिंक') : (language === 'en' ? 'Local' : language === 'mr' ? 'लोकल' : 'लोकल')}
                   </span>
                 </div>
                 <span className="text-[11px] text-[#565e74] truncate">
-                  {tx.txnNumber} • {tx.recycler.nameHi}
+                  {tx.txnNumber} • {language === 'mr' ? (tx.recycler.nameMr || tx.recycler.nameHi) : language === 'en' ? tx.recycler.nameEn : tx.recycler.nameHi}
                 </span>
                 <span className="text-[11px] text-[#006948] font-bold">
                   {tx.weightKg.toFixed(1)} KG @ ₹{tx.ratePerKg}/KG
@@ -167,7 +167,7 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
                 ₹{tx.totalPayout.toLocaleString('en-IN')}
               </span>
               <span className="text-[11px] text-[#565e74] flex items-center gap-0.5">
-                <span>रसीद देखें</span>
+                <span>{language === 'en' ? 'View Receipt' : language === 'mr' ? 'पावती पहा' : 'रसीद देखें'}</span>
                 <span className="material-symbols-outlined text-[14px]">chevron_right</span>
               </span>
             </div>
@@ -179,7 +179,7 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
             <span className="material-symbols-outlined text-[36px] text-[#bccac0]">
               inbox
             </span>
-            <p className="text-[14px] font-medium mt-1">कोई ट्रांजैक्शन नहीं मिला</p>
+            <p className="text-[14px] font-medium mt-1">{language === 'en' ? 'No transactions found' : language === 'mr' ? 'कोणतेही व्यवहार आढळले नाहीत' : 'कोई ट्रांजैक्शन नहीं मिला'}</p>
           </div>
         )}
       </div>
