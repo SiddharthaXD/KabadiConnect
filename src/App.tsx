@@ -345,6 +345,9 @@ export default function App() {
             onLanguageChange={setLanguage}
             transactions={transactions}
             onVerifyTransaction={handleVerifyTransaction}
+            onAddTransaction={(newTxn) =>
+              setTransactions((prev) => [newTxn, ...prev.filter((t) => t.id !== newTxn.id)])
+            }
             onSwitchRole={() => {
               triggerHaptic(25);
               setCurrentScreen('login');

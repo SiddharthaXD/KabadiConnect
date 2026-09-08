@@ -77,4 +77,49 @@ export interface Transaction {
   isSynced: boolean;
   paymentMode: string;
   handoverPassed: boolean;
+  collectorName?: string;
+  collectorCpcbId?: string;
+  geotag?: string;
+  manifestHash?: string;
+  verifiedNetWeightKg?: number;
+  scaleDiscrepancyKg?: number;
+}
+
+export interface IncomingLead {
+  id: string;
+  lotNumber: string;
+  collectorName: string;
+  collectorPhone: string;
+  collectorCpcbId: string;
+  collectorZone: string;
+  distanceKm: number;
+  scrapItem: ScrapItem;
+  estimatedWeightKg: number;
+  offeredRate: number;
+  totalOfferedAmount: number;
+  photoUrl: string;
+  aiConfidence: number;
+  status: 'pending' | 'accepted_pickup' | 'accepted_dropoff' | 'countered' | 'rejected' | 'received';
+  createdAt: string;
+  counterRate?: number;
+  counterAmount?: number;
+  pickupEtaMins?: number;
+  notes?: string;
+}
+
+export interface EprCertificate {
+  cpcbNumber: string;
+  spcbState: string;
+  validTill: string;
+  authorizedCapacityMT: number;
+  currentProcessedMT: number;
+  authorizedMaterials: string[];
+  certificateFileName: string;
+  verificationStatus: 'verified' | 'pending_audit' | 'expired';
+}
+
+export interface BulkRateTier {
+  scrapId: string;
+  minWeightKg: number;
+  premiumBonusPerKg: number;
 }

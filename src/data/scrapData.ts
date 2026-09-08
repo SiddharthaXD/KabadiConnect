@@ -1,4 +1,4 @@
-import { ScrapItem, Recycler, Transaction, UserProfile } from '../types';
+import { ScrapItem, Recycler, Transaction, UserProfile, EprCertificate, IncomingLead } from '../types';
 
 export const DEFAULT_KABADIWALA_PROFILE: UserProfile = {
   role: 'kabadiwala',
@@ -123,6 +123,83 @@ export const RECYCLERS: Recycler[] = [
   },
 ];
 
+export const DEFAULT_EPR_CERTIFICATE: EprCertificate = {
+  cpcbNumber: 'CPCB/EPR-EWASTE/2026/DL-8891',
+  spcbState: 'Delhi Pollution Control Committee (DPCC)',
+  validTill: '31-Mar-2028',
+  authorizedCapacityMT: 450, // 450 Metric Tonnes/year
+  currentProcessedMT: 184.6,
+  authorizedMaterials: [
+    'pcb-motherboard',
+    'copper-wire',
+    'server-boards',
+    'telecom-scrap',
+    'li-ion-battery',
+  ],
+  certificateFileName: 'CPCB_DPCC_Greentech_Auth_Certificate_2026.pdf',
+  verificationStatus: 'verified',
+};
+
+export const INITIAL_LEADS: IncomingLead[] = [
+  {
+    id: 'lead-1',
+    lotNumber: 'LOT-DEL-4091',
+    collectorName: 'रामेश्वर कबाड़ीवाला (Rameshwar)',
+    collectorPhone: '+91 98765 43210',
+    collectorCpcbId: 'KBD-DL-9821',
+    collectorZone: 'ओखला इंडस्ट्रियल एरिया, दिल्ली',
+    distanceKm: 2.1,
+    scrapItem: SCRAP_ITEMS[0], // PCB
+    estimatedWeightKg: 28.5,
+    offeredRate: 300,
+    totalOfferedAmount: 8550,
+    photoUrl: SCRAP_ITEMS[0].imageUrl,
+    aiConfidence: 96,
+    status: 'pending',
+    createdAt: '10 mins ago',
+    pickupEtaMins: 20,
+    notes: 'Grade-A Server & PC motherboards cleaned and stripped without plastics.',
+  },
+  {
+    id: 'lead-2',
+    lotNumber: 'LOT-DEL-4088',
+    collectorName: 'अब्दुल रज़ाक स्क्रैप (Abdul Scrap)',
+    collectorPhone: '+91 98112 34567',
+    collectorCpcbId: 'KBD-DL-5514',
+    collectorZone: 'मयूर विहार फेज-1, दिल्ली',
+    distanceKm: 4.6,
+    scrapItem: SCRAP_ITEMS[1], // Copper
+    estimatedWeightKg: 42.0,
+    offeredRate: 550,
+    totalOfferedAmount: 23100,
+    photoUrl: SCRAP_ITEMS[1].imageUrl,
+    aiConfidence: 94,
+    status: 'pending',
+    createdAt: '35 mins ago',
+    pickupEtaMins: 35,
+    notes: 'Pure shiny bright stripped copper cable coils.',
+  },
+  {
+    id: 'lead-3',
+    lotNumber: 'LOT-DEL-4075',
+    collectorName: 'सुरेश कुमार कबाड़ी (Suresh E-Scrap)',
+    collectorPhone: '+91 98223 99881',
+    collectorCpcbId: 'KBD-DL-1102',
+    collectorZone: 'नेहरू प्लेस ई-मार्केट हब, दिल्ली',
+    distanceKm: 5.8,
+    scrapItem: SCRAP_ITEMS[2], // Li-ion
+    estimatedWeightKg: 18.0,
+    offeredRate: 130,
+    totalOfferedAmount: 2340,
+    photoUrl: SCRAP_ITEMS[2].imageUrl,
+    aiConfidence: 91,
+    status: 'accepted_pickup',
+    createdAt: '1 hr ago',
+    pickupEtaMins: 15,
+    notes: 'Sorted mobile battery packs in heavy anti-static crates.',
+  },
+];
+
 export const INITIAL_TRANSACTIONS: Transaction[] = [
   {
     id: 'tx-1',
@@ -133,9 +210,15 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     ratePerKg: 300,
     totalPayout: 4650,
     recycler: RECYCLERS[0],
-    isSynced: false,
-    paymentMode: 'नकद / UPI',
+    isSynced: true,
+    paymentMode: 'UPI (PhonePe Instant)',
     handoverPassed: true,
+    collectorName: 'रामेश्वर कबाड़ीवाला',
+    collectorCpcbId: 'KBD-DL-9821',
+    geotag: '28.5355° N, 77.2731° E (Okhla Phase 2 Facility)',
+    manifestHash: 'EPR-0x89F4-C12D-9842',
+    verifiedNetWeightKg: 15.5,
+    scaleDiscrepancyKg: 0.0,
   },
   {
     id: 'tx-2',
@@ -147,8 +230,14 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     totalPayout: 6480,
     recycler: RECYCLERS[0],
     isSynced: true,
-    paymentMode: 'UPI (PhonePe)',
+    paymentMode: 'UPI (Direct Bank Transfer)',
     handoverPassed: true,
+    collectorName: 'अब्दुल रज़ाक स्क्रैप',
+    collectorCpcbId: 'KBD-DL-5514',
+    geotag: '28.5361° N, 77.2740° E (Gate #2 Weighbridge)',
+    manifestHash: 'EPR-0x34A1-B89E-8939',
+    verifiedNetWeightKg: 12.0,
+    scaleDiscrepancyKg: 0.0,
   },
   {
     id: 'tx-3',
@@ -157,10 +246,16 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     scrapItem: SCRAP_ITEMS[0], // PCB
     weightKg: 13.5,
     ratePerKg: 275,
-    totalPayout: 3720,
-    recycler: RECYCLERS[1],
+    totalPayout: 3712,
+    recycler: RECYCLERS[0],
     isSynced: true,
-    paymentMode: 'नकद (Cash)',
+    paymentMode: 'नकद (Cash with Voucher)',
     handoverPassed: true,
+    collectorName: 'सुरेश कुमार कबाड़ी',
+    collectorCpcbId: 'KBD-DL-1102',
+    geotag: '28.5358° N, 77.2734° E (Intake Bay #1)',
+    manifestHash: 'EPR-0x72C8-D41F-8921',
+    verifiedNetWeightKg: 13.5,
+    scaleDiscrepancyKg: 0.0,
   },
 ];
