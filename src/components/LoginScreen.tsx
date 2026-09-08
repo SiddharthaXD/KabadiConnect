@@ -107,7 +107,7 @@ const LOGIN_LOCALES: Record<Language, LoginLocaleContent> = {
     audioOtpSent: 'ओटीपी 4829 भेजा गया है। पुष्टि करें।',
     audioWelcomeKabadiwala: 'कबाड़ीवाला प्रोफाइल में सफल लॉगिन। आपका स्वागत है।',
     audioWelcomeRecycler: 'रीसाइक्लर पोर्टल में सफल लॉगिन। आपका स्वागत है।',
-    audioLangSwitched: 'हिन्दी भाषा चुनी गई। स्मार्ट कबाड़ी में आपका स्वागत है।',
+    audioLangSwitched: 'हिन्दी भाषा चुनी गई। कबाड़ीवाला कनेक्ट में आपका स्वागत है।',
     audioDemoKabadiwala: 'कबाड़ीवाला के रूप में लॉगिन किया गया।',
     audioDemoRecycler: 'रीसाइक्लर के रूप में लॉगिन किया गया।',
   },
@@ -152,7 +152,7 @@ const LOGIN_LOCALES: Record<Language, LoginLocaleContent> = {
     audioOtpSent: 'OTP 4829 sent. Please confirm.',
     audioWelcomeKabadiwala: 'Successfully logged in to Kabadiwala dashboard. Welcome!',
     audioWelcomeRecycler: 'Successfully logged in to Recycler Intake Portal. Welcome!',
-    audioLangSwitched: 'English language selected. Welcome to SmartKabadi.',
+    audioLangSwitched: 'English language selected. Welcome to Kabadiwala Connect.',
     audioDemoKabadiwala: 'Signed in as Kabadiwala collector.',
     audioDemoRecycler: 'Signed in as Authorized Recycler.',
   },
@@ -195,7 +195,7 @@ const LOGIN_LOCALES: Record<Language, LoginLocaleContent> = {
     audioOtpSent: 'ओटीपी ४८२९ पाठवला आहे. पुष्टी करा.',
     audioWelcomeKabadiwala: 'कबाडीवाला प्रोफाइलमध्ये यशस्वी लॉगिन. आपले स्वागत आहे.',
     audioWelcomeRecycler: 'अधिकृत रिसायकलर पोर्टलमध्ये यशस्वी लॉगिन. आपले स्वागत आहे.',
-    audioLangSwitched: 'मराठी भाषा निवडली. स्मार्ट कबाडी मध्ये आपले स्वागत आहे.',
+    audioLangSwitched: 'मराठी भाषा निवडली. कबाडीवाला कनेक्ट मध्ये आपले स्वागत आहे.',
     audioDemoKabadiwala: 'कबाडीवाला म्हणून थेट लॉगिन केले.',
     audioDemoRecycler: 'अधिकृत रिसायकलर म्हणून थेट लॉगिन केले.',
   },
@@ -343,8 +343,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             isModal ? 'text-[22px]' : 'text-[26px]'
           } font-black text-[#191c1e] tracking-tight`}
         >
-          SmartKabadi
+          Kabadiwala Connect
         </h1>
+        <p className="text-[13px] text-[#565e74] font-semibold mt-0.5">
+          {language === 'mr' ? 'लॉग इन' : language === 'hi' ? 'लॉग इन' : 'Log in'}
+        </p>
         <p className="text-[13px] text-[#565e74] font-semibold mt-0.5">{t.platformSubtitle}</p>
 
         {/* Vernacular Audio Instruction Button */}

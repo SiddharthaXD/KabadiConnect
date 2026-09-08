@@ -251,9 +251,9 @@ export default function App() {
   const getScreenTitle = () => {
     switch (currentScreen) {
       case 'home':
-        return 'SmartKabadi';
+        return 'Kabadiwala Connect';
       case 'recycler_dashboard':
-        return 'SmartKabadi (रीसाइक्लर)';
+        return 'Kabadiwala Connect (रीसाइक्लर)';
       case 'scanner':
         return 'सामान स्कैन करें';
       case 'weighing':
@@ -265,9 +265,9 @@ export default function App() {
       case 'support':
         return 'मदद व सहायता (Support)';
       case 'login':
-        return language === 'en' ? 'SmartKabadi Sign In' : 'SmartKabadi लॉगिन';
+        return language === 'en' ? 'Kabadiwala Connect Sign In' : 'Kabadiwala Connect लॉगिन';
       default:
-        return 'SmartKabadi';
+        return 'Kabadiwala Connect';
     }
   };
 

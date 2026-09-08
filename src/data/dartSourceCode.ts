@@ -50,16 +50,16 @@ import 'screens/home_dashboard.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const SmartKabadiApp());
+  runApp(const Kabadiwala ConnectApp());
 }
 
-class SmartKabadiApp extends StatelessWidget {
-  const SmartKabadiApp({super.key});
+class Kabadiwala ConnectApp extends StatelessWidget {
+  const Kabadiwala ConnectApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SmartKabadi',
+      title: 'Kabadiwala Connect',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -161,7 +161,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'SmartKabadi',
+                                'Kabadiwala Connect',
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -1148,7 +1148,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
               const SizedBox(height: 12),
               Center(
                 child: Text(
-                  'SmartKabadi',
+                  'Kabadiwala Connect',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
@@ -1347,7 +1347,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
 class AppTranslations {
   static const Map<AppLanguage, Map<String, String>> strings = {
     AppLanguage.hi: {
-      'appName': 'SmartKabadi',
+      'appName': 'Kabadiwala Connect',
       'kabadiTitle': 'कबाड़ीवाला डैशबोर्ड',
       'recyclerTitle': 'रीसाइक्लर पोर्टल',
       'scanWaste': 'कचरा स्कैन करें',
@@ -1356,7 +1356,7 @@ class AppTranslations {
       'scanQrToken': 'कबाड़ीवाला टोकन स्कैन करें',
     },
     AppLanguage.en: {
-      'appName': 'SmartKabadi',
+      'appName': 'Kabadiwala Connect',
       'kabadiTitle': 'Collector Dashboard',
       'recyclerTitle': 'Authorized Recycler Intake',
       'scanWaste': 'Scan Scrap Item',
@@ -1365,7 +1365,7 @@ class AppTranslations {
       'scanQrToken': 'Scan Collector QR Token',
     },
     AppLanguage.mr: {
-      'appName': 'SmartKabadi',
+      'appName': 'Kabadiwala Connect',
       'kabadiTitle': 'कबाडीवाला डॅशबोर्ड',
       'recyclerTitle': 'अधिकृत रिसायकलर पोर्टल',
       'scanWaste': 'ई-कचरा स्कॅन करा',

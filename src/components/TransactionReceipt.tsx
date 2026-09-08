@@ -124,7 +124,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
-          title: language === 'en' ? 'SmartKabadi Receipt' : language === 'mr' ? 'SmartKabadi पावती' : 'SmartKabadi रसीद',
+          title: language === 'en' ? 'Kabadiwala Connect Receipt' : language === 'mr' ? 'Kabadiwala Connect पावती' : 'Kabadiwala Connect रसीद',
           text: receiptText,
           url: window.location.href,
         });

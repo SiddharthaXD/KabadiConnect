@@ -140,7 +140,7 @@ export interface DashboardTranslations {
 
 export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
   hi: {
-    appName: 'SmartKabadi',
+    appName: 'Kabadiwala Connect',
     langSwitchTitle: 'भाषा चुनें',
     kabadiwalaRoleName: 'कबाड़ीवाला',
     recyclerRoleName: 'रिसाइक्लर',
@@ -160,13 +160,13 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     },
 
     kabadiwala: {
-      pageTitle: 'SmartKabadi - कबाड़ीवाला डैशबोर्ड',
+      pageTitle: 'Kabadiwala Connect - कबाड़ीवाला डैशबोर्ड',
       greeting: 'नमस्ते, रामेश्वर जी! आज का कारोबार शुरू करें',
       voiceBannerTitle: 'आवाज़ से सुनें',
       voiceBannerSubtitle: 'निर्देश और मंडी भाव सुनने हेतु टैप करें',
       speakBtn: 'बोलें',
       audioWelcomePrompt:
-        'SmartKabadi में आपका स्वागत है। बड़ा हरा कैमरा बटन दबाकर कचरा स्कैन करें और तुरंत सरकारी मंडी भाव जानें।',
+        'Kabadiwala Connect में आपका स्वागत है। बड़ा हरा कैमरा बटन दबाकर कचरा स्कैन करें और तुरंत सरकारी मंडी भाव जानें।',
       offlineModeTitle: 'ऑफलाइन मोड सुरक्षित',
       offlineModeDesc: 'इंटरनेट न होने पर भी वजन और रसीद सुरक्षित रहती है',
       syncPendingBtn: 'सिंक करें (Sync Now)',
@@ -200,7 +200,7 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     },
 
     recycler: {
-      pageTitle: 'SmartKabadi - अधिकृत रिसाइक्लर पोर्टल',
+      pageTitle: 'Kabadiwala Connect - अधिकृत रिसाइक्लर पोर्टल',
       intakeCenterActive: 'खरीद केंद्र सक्रिय',
       totalProcuredTitle: 'कुल खरीद (Procured)',
       totalProcuredSubtitle: 'ई-कचरा आवक',
@@ -275,7 +275,7 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
   },
 
   en: {
-    appName: 'SmartKabadi',
+    appName: 'Kabadiwala Connect',
     langSwitchTitle: 'Select Language',
     kabadiwalaRoleName: 'Kabadiwala',
     recyclerRoleName: 'Recycler',
@@ -295,13 +295,13 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     },
 
     kabadiwala: {
-      pageTitle: 'SmartKabadi - Kabadiwala Dashboard',
+      pageTitle: 'Kabadiwala Connect - Kabadiwala Dashboard',
       greeting: "Hello, Rameshwar! Start today's scrap business",
       voiceBannerTitle: 'Listen via Voice',
       voiceBannerSubtitle: 'Tap to hear app instructions and live mandi rates',
       speakBtn: 'Listen',
       audioWelcomePrompt:
-        'Welcome to SmartKabadi. Press the big green camera button to scan scrap and get live government rates.',
+        'Welcome to Kabadiwala Connect. Press the big green camera button to scan scrap and get live government rates.',
       offlineModeTitle: 'Offline Mode Protected',
       offlineModeDesc: 'Weights and receipts are saved locally even without internet',
       syncPendingBtn: 'Sync Now',
@@ -335,7 +335,7 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     },
 
     recycler: {
-      pageTitle: 'SmartKabadi - Recycler Portal',
+      pageTitle: 'Kabadiwala Connect - Recycler Portal',
       intakeCenterActive: 'Intake Center Active',
       totalProcuredTitle: 'Total Procured',
       totalProcuredSubtitle: 'E-Waste Inflow Volume',
@@ -410,7 +410,7 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
   },
 
   mr: {
-    appName: 'SmartKabadi',
+    appName: 'Kabadiwala Connect',
     langSwitchTitle: 'भाषा निवडा',
     kabadiwalaRoleName: 'कबाडीवाला',
     recyclerRoleName: 'रिसायकलर',
@@ -430,13 +430,13 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     },
 
     kabadiwala: {
-      pageTitle: 'SmartKabadi - कबाडीवाला डॅशबोर्ड',
+      pageTitle: 'Kabadiwala Connect - कबाडीवाला डॅशबोर्ड',
       greeting: 'नमस्कार, रामेश्वर जी! आजचा ई-कचरा व्यापार सुरू करा',
       voiceBannerTitle: 'आवाजाने ऐका',
       voiceBannerSubtitle: 'सूचना आणि थेट बाजार भाव ऐकण्यासाठी टॅप करा',
       speakBtn: 'ऐका',
       audioWelcomePrompt:
-        'SmartKabadi मध्ये आपले स्वागत आहे. मोठा हिरवा कॅमेरा बटण दाबून कचरा स्कॅन करा आणि थेट सरकारी बाजार भाव पहा.',
+        'Kabadiwala Connect मध्ये आपले स्वागत आहे. मोठा हिरवा कॅमेरा बटण दाबून कचरा स्कॅन करा आणि थेट सरकारी बाजार भाव पहा.',
       offlineModeTitle: 'ऑफलाईन मोड सुरक्षित',
       offlineModeDesc: 'इंटरनेट नसतानाही वजन नोंदी आणि डिजिटल पावत्या सुरक्षित राहतात',
       syncPendingBtn: 'सिंक करा (Sync Now)',
@@ -470,7 +470,7 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     },
 
     recycler: {
-      pageTitle: 'SmartKabadi - अधिकृत रिसायकलर पोर्टल',
+      pageTitle: 'Kabadiwala Connect - अधिकृत रिसायकलर पोर्टल',
       intakeCenterActive: 'खरेदी केंद्र सुरू आहे',
       totalProcuredTitle: 'एकूण खरेदी (Procured)',
       totalProcuredSubtitle: 'ई-कचरा आवक प्रमाण',

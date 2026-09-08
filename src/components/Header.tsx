@@ -46,10 +46,10 @@ export const Header: React.FC<HeaderProps> = ({
     } else if (currentScreen === 'home') {
       speakVernacular(
         language === 'mr'
-          ? 'SmartKabadi होम डॅशबोर्ड. ई-कचरा स्कॅन करण्यासाठी हिरवे बटण दाबा.'
+          ? 'Kabadiwala Connect होम डॅशबोर्ड. ई-कचरा स्कॅन करण्यासाठी हिरवे बटण दाबा.'
           : language === 'en'
-          ? 'SmartKabadi Home Dashboard. Tap the large green button to scan scrap.'
-          : 'SmartKabadi होम डैशबोर्ड। कचरा स्कैन करने के लिए बड़ा हरा बटन दबाएं।',
+          ? 'Kabadiwala Connect Home Dashboard. Tap the large green button to scan scrap.'
+          : 'Kabadiwala Connect होम डैशबोर्ड। कचरा स्कैन करने के लिए बड़ा हरा बटन दबाएं।',
         language
       );
     } else if (currentScreen === 'scanner') {
@@ -100,10 +100,10 @@ export const Header: React.FC<HeaderProps> = ({
     } else if (currentScreen === 'login') {
       speakVernacular(
         language === 'mr'
-          ? 'SmartKabadi लॉगिन स्क्रीन. तुमची भूमिका निवडा: कबाडीवाला किंवा अधिकृत रिसायकलर.'
+          ? 'Kabadiwala Connect लॉगिन स्क्रीन. तुमची भूमिका निवडा: कबाडीवाला किंवा अधिकृत रिसायकलर.'
           : language === 'en'
-          ? 'SmartKabadi Login screen. Please choose your role: Kabadiwala collector or Authorized Recycler.'
-          : 'SmartKabadi लॉगिन स्क्रीन। अपनी भूमिका चुनें: कबाड़ीवाला या अधिकृत रीसाइक्लर।',
+          ? 'Kabadiwala Connect Login screen. Please choose your role: Kabadiwala collector or Authorized Recycler.'
+          : 'Kabadiwala Connect लॉगिन स्क्रीन। अपनी भूमिका चुनें: कबाड़ीवाला या अधिकृत रीसाइक्लर।',
         language
       );
     }
@@ -137,7 +137,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <div className="flex flex-col">
               <span className="text-[17px] font-bold text-[#191c1e] tracking-tight leading-tight">
-                {title || (isHome ? 'SmartKabadi' : 'New Scrap Weighing')}
+                {title || (isHome ? 'Kabadiwala Connect' : 'New Scrap Weighing')}
               </span>
               <span className="text-[12px] text-[#006948] font-bold leading-none">
                 {currentScreen === 'login'
