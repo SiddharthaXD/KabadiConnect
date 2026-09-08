@@ -284,6 +284,7 @@ export default function App() {
         isSyncing={isSyncing}
         title={getScreenTitle()}
         userProfile={userProfile}
+        isLoggedIn={isLoggedIn}
         onOpenLogin={() => {
           triggerHaptic(20);
           setShowLoginModal(true);

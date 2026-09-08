@@ -15,6 +15,7 @@ interface HeaderProps {
   userProfile?: UserProfile;
   onOpenLogin: () => void;
   onToggleOnline?: () => void;
+  isLoggedIn?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -29,6 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   userProfile,
   onOpenLogin,
   onToggleOnline,
+  isLoggedIn,
 }) => {
   const isHome = currentScreen === 'home';
 
@@ -207,101 +209,65 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Row 2: Status & Vernacular Language Selector */}
-        <div className="flex items-center justify-between pt-0.5">
-          <div className="flex items-center gap-2">
-            <button
-              id="btn-header-toggle-online"
-              type="button"
-              onClick={() => {
-                triggerHaptic(20);
-                onToggleOnline?.();
-              }}
-              title={
-                isOnline
-                  ? 'ऑनलाइन मोड सक्रिय है। ऑफ़लाइन टेस्ट करने के लिए क्लिक करें'
-                  : 'ऑफ़लाइन मोड सक्रिय है। ऑनलाइन वापस आने के लिए क्लिक करें'
-              }
-              aria-label={isOnline ? 'Toggle offline mode' : 'Toggle online mode'}
-              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-[#006948] border border-[#bccac0]/40 hover:bg-[#f2f4f6] active:scale-95 transition-all cursor-pointer"
-            >
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  isOnline ? 'bg-[#006948] animate-pulse' : 'bg-[#8d4b00]'
-                }`}
-              />
-              <span className="text-[11px] font-bold">
-                {isOnline ? 'ऑनलाइन Online' : 'ऑफ़लाइन Offline'}
-              </span>
-            </button>
+        {/* Row 2: Status & Quick Controls (Online, Sync, and Switch after login at equal distances) */}
+        <div
+          className={`grid ${
+            currentScreen !== 'login' && isLoggedIn !== false
+              ? 'grid-cols-3'
+              : 'grid-cols-2'
+          } gap-2 pt-1 w-full`}
+        >
+          <button
+            id="btn-header-toggle-online"
+            type="button"
+            onClick={() => {
+              triggerHaptic(20);
+              onToggleOnline?.();
+            }}
+            title={
+              isOnline
+                ? 'ऑनलाइन मोड सक्रिय है। ऑफ़लाइन टेस्ट करने के लिए क्लिक करें'
+                : 'ऑफ़लाइन मोड सक्रिय है। ऑनलाइन वापस आने के लिए क्लिक करें'
+            }
+            aria-label={isOnline ? 'Toggle offline mode' : 'Toggle online mode'}
+            className="w-full inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05)] text-[#006948] border border-[#bccac0]/40 hover:bg-[#f2f4f6] active:scale-95 transition-all cursor-pointer"
+          >
+            <span
+              className={`w-2 h-2 rounded-full shrink-0 ${
+                isOnline ? 'bg-[#006948] animate-pulse' : 'bg-[#8d4b00]'
+              }`}
+            />
+            <span className="text-[11px] font-bold truncate">
+              {isOnline ? 'ऑनलाइन' : 'ऑफ़लाइन'}
+            </span>
+          </button>
 
-            <button
-              id="btn-header-sync"
-              onClick={onSync}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#eceef0] text-[#3d4a42] hover:bg-[#e0e3e5] active:scale-95 transition-all text-[11px] border border-transparent hover:border-[#bccac0]"
+          <button
+            id="btn-header-sync"
+            onClick={onSync}
+            className="w-full inline-flex items-center justify-center gap-1 px-2 py-1 rounded-full bg-[#eceef0] text-[#3d4a42] hover:bg-[#e0e3e5] active:scale-95 transition-all text-[11px] font-bold border border-[#bccac0]/30 hover:border-[#bccac0]"
+          >
+            <span
+              className={`material-symbols-outlined text-[13px] shrink-0 ${
+                isSyncing ? 'animate-spin text-[#006948]' : ''
+              }`}
             >
-              <span
-                className={`material-symbols-outlined text-[13px] ${
-                  isSyncing ? 'animate-spin text-[#006948]' : ''
-                }`}
-              >
-                sync
-              </span>
-              <span>{isSyncing ? 'सिंक हो रहा...' : 'सिंक'}</span>
-            </button>
+              sync
+            </span>
+            <span className="truncate">{isSyncing ? 'सिंक...' : 'सिंक Sync'}</span>
+          </button>
 
-            {/* Quick Switch to other role shortcut button */}
+          {/* Quick Switch to other role shortcut button - only shown after login */}
+          {currentScreen !== 'login' && isLoggedIn !== false && (
             <button
               onClick={onOpenLogin}
-              className="text-[11px] font-bold text-[#006948] hover:underline flex items-center gap-0.5"
+              title="भूमिका बदलें / Switch Role"
+              className="w-full inline-flex items-center justify-center gap-1 px-2 py-1 rounded-full bg-[#e6f4ea] text-[#006948] hover:bg-[#ceebd7] active:scale-95 transition-all text-[11px] font-bold border border-[#006948]/20"
             >
-              <span className="material-symbols-outlined text-[13px]">swap_horiz</span>
-              <span className="hidden sm:inline">बदलें</span>
+              <span className="material-symbols-outlined text-[13px] shrink-0">swap_horiz</span>
+              <span className="truncate">बदलें Switch</span>
             </button>
-          </div>
-
-          {/* Language Selector */}
-          <div className="flex items-center rounded-full bg-[#e6e8ea] p-0.5 border border-[#bccac0]/30">
-            <button
-              onClick={() => {
-                triggerHaptic(15);
-                onLanguageChange('hi');
-              }}
-              className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all ${
-                language === 'hi'
-                  ? 'bg-[#006948] text-white shadow-sm'
-                  : 'text-[#3d4a42] hover:text-[#191c1e]'
-              }`}
-            >
-              HI हिंदी
-            </button>
-            <button
-              onClick={() => {
-                triggerHaptic(15);
-                onLanguageChange('en');
-              }}
-              className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all ${
-                language === 'en'
-                  ? 'bg-[#006948] text-white shadow-sm'
-                  : 'text-[#3d4a42] hover:text-[#191c1e]'
-              }`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => {
-                triggerHaptic(15);
-                onLanguageChange('mr');
-              }}
-              className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all ${
-                language === 'mr'
-                  ? 'bg-[#006948] text-white shadow-sm'
-                  : 'text-[#3d4a42] hover:text-[#191c1e]'
-              }`}
-            >
-              MR
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </header>
