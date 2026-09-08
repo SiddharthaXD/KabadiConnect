@@ -115,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  const isRootScreen = isHome || currentScreen === 'login';
+  const isRootScreen = isHome || currentScreen === 'login' || currentScreen === 'recycler_dashboard';
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 bg-[#f7f9fb]/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#bccac0]/30 pt-safe">
@@ -137,13 +137,24 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             ) : (
               <div className="w-10 h-10 rounded-xl bg-[#006948] flex items-center justify-center text-white shadow-sm shrink-0">
-                <span className="material-symbols-outlined text-[24px]">recycling</span>
+                <span className="material-symbols-outlined text-[24px]">
+                  {currentScreen === 'recycler_dashboard' ? 'factory' : 'recycling'}
+                </span>
               </div>
             )}
 
             <div className="flex flex-col">
               <span className="text-[17px] font-bold text-[#191c1e] tracking-tight leading-tight">
-                {title || (isHome ? 'Kabadiwala Connect' : 'New Scrap Weighing')}
+                {title ||
+                  (currentScreen === 'recycler_dashboard'
+                    ? language === 'mr'
+                      ? 'रिसायकलर पोर्टल'
+                      : language === 'en'
+                      ? 'Recycler Portal'
+                      : 'रीसाइक्लर पोर्टल'
+                    : isHome
+                    ? 'Kabadiwala Connect'
+                    : 'New Scrap Weighing')}
               </span>
               <span className="text-[12px] text-[#006948] font-bold leading-none">
                 {currentScreen === 'login'
@@ -152,6 +163,12 @@ export const Header: React.FC<HeaderProps> = ({
                     : language === 'en'
                     ? 'Sign In / Role'
                     : 'प्रवेश / भूमिका चयन'
+                  : currentScreen === 'recycler_dashboard'
+                  ? language === 'mr'
+                    ? 'अधिकृत केंद्र डॅशबोर्ड'
+                    : language === 'en'
+                    ? 'Authorized Center'
+                    : 'अधिकृत केंद्र डैशबोर्ड'
                   : isHome
                   ? 'Home Dashboard'
                   : 'Verified AI Rate'}

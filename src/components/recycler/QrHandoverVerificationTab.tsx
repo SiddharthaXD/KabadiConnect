@@ -40,6 +40,8 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
     const speechMsg =
       language === 'en'
         ? 'Scanning QR code from collector device...'
+        : language === 'mr'
+        ? 'कबाडीवाला डिव्हाइसवरून डिजिटल क्यूआर कोड स्कॅन होत आहे...'
         : 'कबाड़ीवाला डिवाइस से डिजिटल क्यूआर कोड स्कैन हो रहा है...';
     speakVernacular(speechMsg, language);
 
@@ -75,6 +77,8 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
     const msg =
       language === 'en'
         ? `Token ${tx.txnNumber} loaded: ${itemName}, estimated ${tx.weightKg} kg.`
+        : language === 'mr'
+        ? `टोकन ${tx.txnNumber} लोड झाले: ${itemName}, अंदाजे ${tx.weightKg} किलो.`
         : `टोकन ${tx.txnNumber} लोड हुआ: ${itemName}, अनुमानित ${tx.weightKg} किलो।`;
     speakVernacular(msg, language);
   };
@@ -108,6 +112,8 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
     const msg =
       language === 'en'
         ? `Handover verified! Final payout ₹${calculatedPayout} authorized. EPR manifest generated.`
+        : language === 'mr'
+        ? `हँडओव्हर सत्यापित! अंतिम पेमेंट ₹${calculatedPayout} मंजूर. EPR पावती तयार झाली.`
         : `हैंडओवर सत्यापित! अंतिम भुगतान ₹${calculatedPayout} स्वीकृत। सरकारी EPR रसीद जनरेट हुई।`;
     speakVernacular(msg, language);
   };
@@ -124,12 +130,16 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
             <h3 className="text-[17px] font-black text-[#191c1e] dark:text-[#ffffff]">
               {language === 'en'
                 ? 'Facility QR Scanner & Discrepancy Resolution'
+                : language === 'mr'
+                ? 'सुविधा QR स्कॅनर आणि वजन पडताळणी'
                 : 'सुविधा QR स्कैनर एवं तौल विसंगति समाधान'}
             </h3>
           </div>
           <p className="text-[12px] text-[#565e74] dark:text-[#94a3b8] mt-0.5">
             {language === 'en'
               ? 'Scan the collector handover pass, reconcile scale weight, and sign off the digital EPR manifest.'
+              : language === 'mr'
+              ? 'कबाडीवाल्याचा पास स्कॅन करा, डिजिटल काट्यावर अचूक वजन तपासा आणि डिजिटल EPR पावती स्वाक्षरी करा.'
               : 'कबाड़ीवाला का पास स्कैन करें, डिजिटल कांटे पर वास्तविक वजन मिलाएं और डिजिटल हस्ताक्षर करें।'}
           </p>
         </div>
@@ -148,7 +158,19 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
             >
               {isCameraActive ? 'sync' : 'center_focus_strong'}
             </span>
-            <span>{isCameraActive ? 'Scanning Gate Pass...' : 'Launch QR Scanner'}</span>
+            <span>
+              {isCameraActive
+                ? language === 'mr'
+                  ? 'गेट पास स्कॅन होत आहे...'
+                  : language === 'en'
+                  ? 'Scanning Gate Pass...'
+                  : 'गेट पास स्कैन हो रहा है...'
+                : language === 'mr'
+                ? 'QR स्कॅनर सुरू करा'
+                : language === 'en'
+                ? 'Launch QR Scanner'
+                : 'QR स्कैनर शुरू करें'}
+            </span>
           </button>
         </div>
       </div>
@@ -161,7 +183,13 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
             type="text"
             value={manualTokenInput}
             onChange={(e) => setManualTokenInput(e.target.value)}
-            placeholder="Or enter Token Number (e.g. #TXN-89421 or LOT-DEL-4091)..."
+            placeholder={
+              language === 'mr'
+                ? 'किंवा टोकन नंबर प्रविष्ट करा (#TXN-89421 किंवा LOT-DEL-4091)...'
+                : language === 'en'
+                ? 'Or enter Token Number (e.g. #TXN-89421 or LOT-DEL-4091)...'
+                : 'या टोकन नंबर दर्ज करें (उदा. #TXN-89421 या LOT-DEL-4091)...'
+            }
             className="w-full h-10 px-3 bg-white dark:bg-[#182430] border border-[#bccac0]/60 dark:border-[#33485c] rounded-xl text-[13px] font-bold font-mono text-[#191c1e] dark:text-[#ffffff] focus:outline-hidden"
           />
         </div>
@@ -170,7 +198,9 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
           onClick={handleManualLookup}
           className="w-full sm:w-auto h-10 px-5 bg-[#191c1e] text-white rounded-xl font-bold text-[12px] flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer shrink-0"
         >
-          <span>Fetch Token Record</span>
+          <span>
+            {language === 'mr' ? 'टोकन शोधा' : language === 'en' ? 'Fetch Token Record' : 'टोकन खोजें'}
+          </span>
         </button>
       </div>
 
@@ -301,7 +331,11 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
             <div>
               <label className="text-[12px] font-bold text-[#191c1e] dark:text-[#ffffff] block mb-1">
-                {language === 'en' ? 'Disbursement Payment Mode' : 'भुगतान माध्यम'}
+                {language === 'en'
+                  ? 'Disbursement Payment Mode'
+                  : language === 'mr'
+                  ? 'पेमेंट पद्धत'
+                  : 'भुगतान माध्यम'}
               </label>
               <select
                 value={paymentMode}
@@ -316,7 +350,11 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
 
             <div>
               <label className="text-[12px] font-bold text-[#191c1e] dark:text-[#ffffff] block mb-1">
-                {language === 'en' ? 'Weighbridge & Inspection Notes' : 'कांटा एवं निरीक्षण टिप्पणी'}
+                {language === 'en'
+                  ? 'Weighbridge & Inspection Notes'
+                  : language === 'mr'
+                  ? 'काटा आणि तपासणी टिप्पणी'
+                  : 'कांटा एवं निरीक्षण टिप्पणी'}
               </label>
               <input
                 type="text"
@@ -331,7 +369,13 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
           <div className="pt-3 border-t border-[#bccac0]/40 dark:border-[#263849] flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-[12px] text-[#565e74] dark:text-[#94a3b8]">
               <span className="material-symbols-outlined text-[18px] text-[#006948]">lock</span>
-              <span>Generates cryptographically timestamped CPCB Form-2 manifest hash.</span>
+              <span>
+                {language === 'en'
+                  ? 'Generates cryptographically timestamped CPCB Form-2 manifest hash.'
+                  : language === 'mr'
+                  ? 'डिजिटल टाइमस्टॅम्पसह CPCB फॉर्म-२ EPR मॅनिफेस्ट हॅश जनरेट करतो.'
+                  : 'CPCB फॉर्म-2 डिजिटल टाइमस्टैम्प सहित रसीद जनरेट करता है।'}
+              </span>
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -340,7 +384,7 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
                 onClick={() => setActiveTxn(null)}
                 className="px-4 h-12 bg-gray-100 dark:bg-gray-800 text-[#565e74] rounded-xl font-bold text-[13px] active:scale-95"
               >
-                Cancel
+                {language === 'mr' ? 'रद्द करा' : language === 'en' ? 'Cancel' : 'रद्द करें'}
               </button>
 
               <button
@@ -350,7 +394,13 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
                 className="flex-1 sm:flex-initial px-6 h-12 bg-[#006948] hover:bg-[#005238] text-white rounded-xl font-black text-[14px] flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[20px]">draw</span>
-                <span>{language === 'en' ? 'Authorize & Digital Sign-off EPR Manifest' : 'डिजिटल हस्ताक्षर एवं EPR रसीद जारी करें'}</span>
+                <span>
+                  {language === 'en'
+                    ? 'Authorize & Digital Sign-off EPR Manifest'
+                    : language === 'mr'
+                    ? 'डिजिटल स्वाक्षरी आणि EPR पावती जारी करा'
+                    : 'डिजिटल हस्ताक्षर एवं EPR रसीद जारी करें'}
+                </span>
               </button>
             </div>
           </div>
@@ -362,10 +412,18 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
                 <span className="material-symbols-outlined text-[26px]">verified</span>
                 <div>
                   <h5 className="text-[14px] font-black">
-                    EPR Handover Complete & Recorded!
+                    {language === 'en'
+                      ? 'EPR Handover Complete & Recorded!'
+                      : language === 'mr'
+                      ? 'EPR हँडओव्हर पूर्ण व नोंदवले गेले!'
+                      : 'EPR हैंडओवर संपन्न एवं दर्ज!'}
                   </h5>
                   <span className="text-[12px]">
-                    Ledger synchronized. Payout of ₹{calculatedPayout} marked disbursed.
+                    {language === 'en'
+                      ? `Ledger synchronized. Payout of ₹${calculatedPayout} marked disbursed.`
+                      : language === 'mr'
+                      ? `खाते सिंक्रोनाइझ झाले. ₹${calculatedPayout} चे पेमेंट वितरीत झाले.`
+                      : `खाता सिंक्रोनाइज़ हुआ। ₹${calculatedPayout} का भुगतान वितरित चिह्नित।`}
                   </span>
                 </div>
               </div>
@@ -379,11 +437,17 @@ export const QrHandoverVerificationTab: React.FC<QrHandoverVerificationTabProps>
             qr_code_2
           </span>
           <h4 className="text-[15px] font-bold text-[#191c1e] dark:text-[#ffffff]">
-            {language === 'en' ? 'Ready to Scan or Lookup Token' : 'स्कैन या टोकन खोज के लिए तैयार'}
+            {language === 'en'
+              ? 'Ready to Scan or Lookup Token'
+              : language === 'mr'
+              ? 'स्कॅन किंवा टोकन शोधासाठी सज्ज'
+              : 'स्कैन या टोकन खोज के लिए तैयार'}
           </h4>
           <p className="text-[12px] text-[#565e74] dark:text-[#94a3b8] max-w-sm">
             {language === 'en'
               ? 'Click "Launch QR Scanner" above or select an incoming lead to verify weight at the weighbridge.'
+              : language === 'mr'
+              ? 'वरील "QR स्कॅनर सुरू करा" दाबा किंवा वजन तपासण्यासाठी येणारा लॉट निवडा.'
               : 'ऊपर "Launch QR Scanner" दबाएं या आने वाले लॉट से तौल सत्यापन प्रारंभ करें।'}
           </p>
         </div>

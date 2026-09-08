@@ -80,12 +80,16 @@ export const RateCardManagerTab: React.FC<RateCardManagerTabProps> = ({
             <h3 className="text-[17px] font-black text-[#191c1e] dark:text-[#ffffff]">
               {language === 'en'
                 ? 'Dynamic Rate Card & Bulk Premiums'
+                : language === 'mr'
+                ? 'दर सूची आणि बल्क प्रीमियम व्यवस्थापक'
                 : 'दैनिक खरीद दर एवं बल्क प्रीमियम प्रबंधक'}
             </h3>
           </div>
           <p className="text-[12px] text-[#565e74] dark:text-[#94a3b8] mt-0.5">
             {language === 'en'
               ? 'These live rates feed directly into collector apps and AI valuation algorithms.'
+              : language === 'mr'
+              ? 'हे थेट दर कबाडीवाला ॲप आणि AI मूल्य निर्धारण प्रणालीमध्ये लगेच परावर्तित होतात.'
               : 'ये दरें कबाड़ीवाला ऐप व AI गणना इंजन में वास्तविक समय में दिखाई देती हैं।'}
           </p>
         </div>
@@ -98,10 +102,16 @@ export const RateCardManagerTab: React.FC<RateCardManagerTabProps> = ({
             className="h-11 px-5 bg-[#006948] hover:bg-[#005238] text-white rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 shadow-[0_2px_0px_#191c1e] active:scale-95 transition-all cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">cell_tower</span>
-            <span>{language === 'en' ? 'Publish Rates to Network' : 'नेटवर्क पर लाइव रेट्स जारी करें'}</span>
+            <span>
+              {language === 'en'
+                ? 'Publish Rates to Network'
+                : language === 'mr'
+                ? 'नेटवर्कवर थेट दर प्रकाशित करा'
+                : 'नेटवर्क पर लाइव रेट्स जारी करें'}
+            </span>
           </button>
           <span className="text-[10px] text-[#565e74] dark:text-[#94a3b8]">
-            {language === 'en' ? 'Last Broadcast:' : 'अंतिम प्रसारण:'} {lastPublishedTime}
+            {language === 'en' ? 'Last Broadcast:' : language === 'mr' ? 'शेवटचे प्रसारण:' : 'अंतिम प्रसारण:'} {lastPublishedTime}
           </span>
         </div>
       </div>
@@ -112,6 +122,8 @@ export const RateCardManagerTab: React.FC<RateCardManagerTabProps> = ({
           <span>
             {language === 'en'
               ? 'Rates synchronized! All nearby collectors received your new rate card.'
+              : language === 'mr'
+              ? 'दर अद्ययावत झाले! सर्व जवळच्या कबाडीवाल्यांना नवीन दर सूची मिळाली आहे.'
               : 'दरें प्रसारित हुईं! सभी नजदीकी कबाड़ीवालों के ऐप पर नई दरें लागू हो गई हैं।'}
           </span>
         </div>
@@ -124,10 +136,14 @@ export const RateCardManagerTab: React.FC<RateCardManagerTabProps> = ({
             <span className="material-symbols-outlined text-[#006948] dark:text-[#34d399] text-[20px]">
               table_chart
             </span>
-            {language === 'en' ? 'Daily Price Updater Table' : 'दैनिक खरीद मूल्य सारणी'}
+            {language === 'en'
+              ? 'Daily Price Updater Table'
+              : language === 'mr'
+              ? 'दैनंदिन खरेदी दर तक्ता'
+              : 'दैनिक खरीद मूल्य सारणी'}
           </h4>
           <span className="text-[11px] font-bold text-[#565e74] dark:text-[#94a3b8]">
-            Unit: INR per KG (₹/KG)
+            {language === 'mr' ? 'एकक: रुपये प्रति किलो (₹/KG)' : 'Unit: INR per KG (₹/KG)'}
           </span>
         </div>
 
@@ -135,11 +151,21 @@ export const RateCardManagerTab: React.FC<RateCardManagerTabProps> = ({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#bccac0]/40 dark:border-[#263849] text-[11px] uppercase font-bold text-[#565e74] dark:text-[#94a3b8]">
-                <th className="py-2.5 px-3">{language === 'en' ? 'Material Category' : 'सामग्री श्रेणी'}</th>
-                <th className="py-2.5 px-3 text-center">{language === 'en' ? 'Govt Benchmark' : 'सरकारी बेंचमार्क'}</th>
-                <th className="py-2.5 px-3 text-center">{language === 'en' ? 'Your Buying Rate' : 'आपकी खरीद दर'}</th>
-                <th className="py-2.5 px-3 text-center">{language === 'en' ? 'Bulk Premium (>25kg)' : 'बल्क प्रीमियम (>25kg)'}</th>
-                <th className="py-2.5 px-3 text-right">{language === 'en' ? 'Status' : 'स्थिति'}</th>
+                <th className="py-2.5 px-3">
+                  {language === 'en' ? 'Material Category' : language === 'mr' ? 'साहित्य प्रकार' : 'सामग्री श्रेणी'}
+                </th>
+                <th className="py-2.5 px-3 text-center">
+                  {language === 'en' ? 'Govt Benchmark' : language === 'mr' ? 'सरकारी बेंचमार्क' : 'सरकारी बेंचमार्क'}
+                </th>
+                <th className="py-2.5 px-3 text-center">
+                  {language === 'en' ? 'Your Buying Rate' : language === 'mr' ? 'तुमचा खरेदी दर' : 'आपकी खरीद दर'}
+                </th>
+                <th className="py-2.5 px-3 text-center">
+                  {language === 'en' ? 'Bulk Premium (>25kg)' : language === 'mr' ? 'बल्क प्रीमियम (>२५ किलो)' : 'बल्क प्रीमियम (>25kg)'}
+                </th>
+                <th className="py-2.5 px-3 text-right">
+                  {language === 'en' ? 'Status' : language === 'mr' ? 'स्थिती' : 'स्थिति'}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#bccac0]/30 dark:divide-[#263849]">

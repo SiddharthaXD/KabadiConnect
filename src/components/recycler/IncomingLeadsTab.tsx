@@ -45,6 +45,8 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
     const msg =
       language === 'en'
         ? `Lot ${lead.lotNumber} accepted for facility drop-off.`
+        : language === 'mr'
+        ? `लॉट ${lead.lotNumber} केंद्रावर ड्रॉप-ऑफसाठी स्वीकारला गेला.`
         : `लॉट ${lead.lotNumber} को सुविधा में ड्रॉप-ऑफ हेतु स्वीकार किया गया।`;
     speakVernacular(msg, language);
   };
@@ -55,6 +57,8 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
     const msg =
       language === 'en'
         ? `Pickup van dispatched for ${lead.collectorName}. ETA 20 mins.`
+        : language === 'mr'
+        ? `${lead.collectorName} साठी पिकअप व्हॅन रवाना. अंदाजे वेळ २० मिनिटे.`
         : `${lead.collectorName} के लिए पिकअप वैन रवाना। आगमन समय 20 मिनट।`;
     speakVernacular(msg, language);
   };
@@ -76,6 +80,8 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
     const msg =
       language === 'en'
         ? `Counter offer of ₹${counterRateInput}/kg sent to ${counterModalLead.collectorName}.`
+        : language === 'mr'
+        ? `${counterModalLead.collectorName} यांना ₹${counterRateInput}/kg चा काउंटर ऑफर पाठवला.`
         : `${counterModalLead.collectorName} को ₹${counterRateInput}/kg का काउंटर-ऑफ़र भेजा गया।`;
     speakVernacular(msg, language);
     setCounterModalLead(null);
@@ -87,6 +93,8 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
     const msg =
       language === 'en'
         ? `Lot ${lead.lotNumber} declined.`
+        : language === 'mr'
+        ? `लॉट ${lead.lotNumber} नाकारला गेला.`
         : `लॉट ${lead.lotNumber} अस्वीकार किया गया।`;
     speakVernacular(msg, language);
   };
@@ -103,12 +111,16 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
             <h3 className="text-[17px] font-black text-[#191c1e] dark:text-[#ffffff]">
               {language === 'en'
                 ? 'Incoming Leads & AI Matchmaking Kanban'
+                : language === 'mr'
+                ? 'येणारे लॉट्स आणि AI मॅचमेकिंग डॅशबोर्ड'
                 : 'इनकमिंग लॉट एवं AI मैचमेकिंग डैशबोर्ड'}
             </h3>
           </div>
           <p className="text-[12px] text-[#565e74] dark:text-[#94a3b8] mt-0.5">
             {language === 'en'
               ? 'Real-time e-waste lots posted by verified kabadiwalas in your licensed radius.'
+              : language === 'mr'
+              ? 'तुमच्या परवाना कक्षेत सत्यापित कबाडीवाल्यांनी पोस्ट केलेले रिअल-टाइम लॉट्स.'
               : 'आपके निर्धारित दायरे में सत्यापित कबाड़ीवालों द्वारा पोस्ट किए गए वास्तविक समय के लॉट।'}
           </p>
         </div>
@@ -132,17 +144,25 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
               {tabKey === 'all'
                 ? language === 'en'
                   ? 'All Leads'
+                  : language === 'mr'
+                  ? 'सर्व लॉट्स'
                   : 'सभी'
                 : tabKey === 'pending'
                 ? language === 'en'
                   ? 'Pending Review'
+                  : language === 'mr'
+                  ? 'प्रलंबित'
                   : 'प्रतीक्षारत'
                 : tabKey === 'accepted'
                 ? language === 'en'
                   ? 'Active Pickups'
+                  : language === 'mr'
+                  ? 'स्वीकृत'
                   : 'स्वीकृत'
                 : language === 'en'
                 ? 'Countered'
+                : language === 'mr'
+                ? 'काउंटर'
                 : 'काउंटर'}
             </button>
           ))}
@@ -300,7 +320,7 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
                       className="flex-1 h-10 bg-[#006948] hover:bg-[#005238] text-white rounded-xl font-bold text-[12px] flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 transition-all cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[16px]">local_shipping</span>
-                      <span>{language === 'en' ? 'Dispatch Van' : 'वैन भेजें'}</span>
+                      <span>{language === 'en' ? 'Dispatch Van' : language === 'mr' ? 'पिकअप पाठवा' : 'वैन भेजें'}</span>
                     </button>
 
                     <button
@@ -309,7 +329,7 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
                       className="h-10 px-3 bg-[#f2f4f6] dark:bg-[#182430] text-[#191c1e] dark:text-[#ffffff] rounded-xl font-bold text-[12px] flex items-center justify-center gap-1 border border-[#bccac0]/50 active:scale-95 transition-all cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[16px]">done</span>
-                      <span>{language === 'en' ? 'Drop-off' : 'ड्रॉप-ऑफ'}</span>
+                      <span>{language === 'en' ? 'Drop-off' : language === 'mr' ? 'ड्रॉप-ऑफ' : 'ड्रॉप-ऑफ'}</span>
                     </button>
 
                     <button
@@ -318,14 +338,14 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
                       className="h-10 px-3 bg-white dark:bg-[#0d141b] text-[#003b8e] dark:text-[#93c5fd] rounded-xl font-bold text-[12px] flex items-center justify-center gap-1 border border-[#003b8e]/40 active:scale-95 transition-all cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
-                      <span>{language === 'en' ? 'Counter' : 'काउंटर'}</span>
+                      <span>{language === 'en' ? 'Counter' : language === 'mr' ? 'काउंटर' : 'काउंटर'}</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleRejectLead(lead)}
                       className="w-10 h-10 bg-white dark:bg-[#0d141b] text-[#ba1a1a] rounded-xl font-bold flex items-center justify-center border border-[#ba1a1a]/30 active:scale-95 cursor-pointer"
-                      title="Reject Lot"
+                      title={language === 'en' ? 'Reject Lot' : language === 'mr' ? 'लॉट नाकारा' : 'लॉट अस्वीकार करें'}
                     >
                       <span className="material-symbols-outlined text-[16px]">close</span>
                     </button>
@@ -342,6 +362,8 @@ export const IncomingLeadsTab: React.FC<IncomingLeadsTabProps> = ({
                     <span>
                       {language === 'en'
                         ? 'Collector Arrived: Verify Weigh & Intake'
+                        : language === 'mr'
+                        ? 'कबाडीवाला आला: वजन व इनटेक तपासा'
                         : 'कबाड़ी पहुंच गया: तौल व सत्यापन शुरू करें'}
                     </span>
                   </button>

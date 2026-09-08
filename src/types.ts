@@ -15,12 +15,22 @@ export type Language = 'hi' | 'en' | 'mr';
 export interface UserProfile {
   role: UserRole;
   name: string;
+  nameEn?: string;
+  nameMr?: string;
+  nameHi?: string;
   phone: string;
   businessName: string;
+  businessNameEn?: string;
+  businessNameMr?: string;
+  businessNameHi?: string;
   cpcbId?: string;
   zone: string;
+  zoneEn?: string;
+  zoneMr?: string;
+  zoneHi?: string;
   avatarInitials: string;
   verifiedBadge: string;
+  isOpen?: boolean;
 }
 
 export interface ScrapItem {
@@ -63,6 +73,7 @@ export interface Recycler {
   phone: string;
   isGovtAuthorized: boolean;
   vanArrivalMins?: number;
+  isOpen?: boolean;
 }
 
 export interface Transaction {

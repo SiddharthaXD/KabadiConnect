@@ -19,6 +19,8 @@ interface RecyclerDashboardProps {
   onAddTransaction?: (txn: Transaction) => void;
   onSwitchRole: () => void;
   onUpdateRate: (scrapId: string, newRate: number) => void;
+  isCenterOpen?: boolean;
+  onToggleCenterStatus?: (isOpen: boolean) => void;
 }
 
 type RecyclerTab = 'leads' | 'intake' | 'rates' | 'epr' | 'compliance';
@@ -32,9 +34,38 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
   onAddTransaction,
   onSwitchRole,
   onUpdateRate,
+  isCenterOpen,
+  onToggleCenterStatus,
 }) => {
   const t = TRANSLATIONS[language];
   const rc = t.recycler;
+
+  const [localIsOpen, setLocalIsOpen] = useState<boolean>(
+    isCenterOpen !== undefined ? isCenterOpen : profile.isOpen !== false
+  );
+
+  // Keep synced if parent changes
+  const centerIsOpen = isCenterOpen !== undefined ? isCenterOpen : localIsOpen;
+
+  const handleToggleCenter = (nextState: boolean) => {
+    triggerHaptic(35);
+    setLocalIsOpen(nextState);
+    if (onToggleCenterStatus) {
+      onToggleCenterStatus(nextState);
+    }
+    const msg = nextState
+      ? language === 'mr'
+        ? 'रिसायकलिंग केंद्र आता सुरू केले आहे. कबाडीवाल्यांना केंद्र सुरू दिसेल.'
+        : language === 'en'
+        ? 'Recycling center is now OPEN. Collectors will see your center active.'
+        : 'रीसाइक्लिंग केंद्र अब चालू कर दिया गया है। कबाड़ीवालों को केंद्र खुला दिखेगा।'
+      : language === 'mr'
+        ? 'रिसायकलिंग केंद्र आता बंद केले आहे. कबाडीवाल्यांना केंद्र बंद दिसेल.'
+        : language === 'en'
+        ? 'Recycling center is now CLOSED. Collectors will see your center marked closed.'
+        : 'रीसाइक्लिंग केंद्र अब बंद कर दिया गया है। कबाड़ीवालों को केंद्र बंद दिखेगा।';
+    speakVernacular(msg, language);
+  };
 
   const [activeTab, setActiveTab] = useState<RecyclerTab>('leads');
   const [leads, setLeads] = useState<IncomingLead[]>(INITIAL_LEADS);
@@ -58,6 +89,24 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
   const totalWeightProcured = transactions.reduce((acc, t) => acc + (t.weightKg || 0), 0);
   const totalPayoutDisbursed = transactions.reduce((acc, t) => acc + (t.totalPayout || 0), 0);
   const pendingLeadsCount = leads.filter((l) => l.status === 'pending').length;
+
+  const getLocalizedBusinessName = () => {
+    if (language === 'mr') return profile.businessNameMr || profile.businessName || 'ग्रीनटेक अधिकृत रिसायकलर्स प्रा. लि.';
+    if (language === 'en') return profile.businessNameEn || 'GreenTech Authorized Recyclers Pvt Ltd';
+    return profile.businessNameHi || profile.businessName || 'ग्रीनटेक ऑथराइज़्ड रीसाइक्लर्स प्रा. लि.';
+  };
+
+  const getLocalizedPersonName = () => {
+    if (language === 'en') return profile.nameEn || 'Rajesh Kumar Sharma';
+    if (language === 'mr') return profile.nameMr || profile.name || 'राजेश कुमार शर्मा';
+    return profile.nameHi || profile.name || 'राजेश कुमार शर्मा';
+  };
+
+  const getLocalizedZone = () => {
+    if (language === 'mr') return profile.zoneMr || profile.zone || 'ओखला फेज-२ रिसायकलिंग हब, नवी दिल्ली';
+    if (language === 'en') return profile.zoneEn || 'Okhla Phase-2 Recycling Hub, New Delhi';
+    return profile.zoneHi || profile.zone || 'ओखला फेज-2 रीसाइक्लिंग हब, दिल्ली';
+  };
 
   const handleUpdateRate = (scrapId: string, newRate: number) => {
     setScrapRates((prev) => ({ ...prev, [scrapId]: newRate }));
@@ -114,19 +163,29 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
                 </span>
               </div>
               <h1 className="text-[20px] sm:text-[22px] font-black text-white leading-tight truncate mt-0.5">
-                {profile.businessName}
+                {getLocalizedBusinessName()}
               </h1>
               <span className="text-[12px] text-white/85 truncate">
-                {profile.name} • {profile.zone}
+                {getLocalizedPersonName()} • {getLocalizedZone()}
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className="px-3 py-1.5 rounded-xl bg-white/15 text-white text-[12px] font-bold border border-white/20 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#85f8c4] animate-pulse"></span>
-              {rc.intakeCenterActive}
-            </span>
+            <button
+              id="btn-recycler-header-status-toggle"
+              type="button"
+              onClick={() => handleToggleCenter(!centerIsOpen)}
+              className={`px-3 py-1.5 rounded-xl text-[12px] font-bold border transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 ${
+                centerIsOpen
+                  ? 'bg-[#85f8c4] text-[#002114] border-[#85f8c4] hover:bg-[#85f8c4]/90'
+                  : 'bg-[#ffdad6] text-[#ba1a1a] border-[#ffdad6] hover:bg-[#ffdad6]/90'
+              }`}
+              title={centerIsOpen ? rc.toggleCenterClose : rc.toggleCenterOpen}
+            >
+              <span className={`w-2 h-2 rounded-full ${centerIsOpen ? 'bg-[#006948] animate-ping' : 'bg-[#ba1a1a]'}`}></span>
+              <span>{centerIsOpen ? (language === 'mr' ? 'सुरू (OPEN)' : language === 'en' ? 'OPEN' : 'खुला है (OPEN)') : (language === 'mr' ? 'बंद (CLOSED)' : language === 'en' ? 'CLOSED' : 'बंद है (CLOSED)')}</span>
+            </button>
 
             <button
               onClick={onSwitchRole}
@@ -161,7 +220,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
 
           <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
             <span className="text-[10px] uppercase font-bold text-white/80 block">
-              EPR Target Progress
+              {language === 'mr' ? 'EPR लक्ष्य प्रगती' : language === 'en' ? 'EPR Target Progress' : 'EPR लक्ष्य प्रगति'}
             </span>
             <span className="text-[18px] font-black font-mono text-[#85f8c4]">
               {((certificate.currentProcessedMT + totalWeightProcured / 1000)).toFixed(1)} / {certificate.authorizedCapacityMT} MT
@@ -170,7 +229,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
 
           <div className="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
             <span className="text-[10px] uppercase font-bold text-white/80 block">
-              Active Fleet Radius
+              {language === 'mr' ? 'सक्रिय फ्लीट त्रिज्या' : language === 'en' ? 'Active Fleet Radius' : 'सक्रिय फ्लीट दायरा'}
             </span>
             <span className="text-[18px] font-black font-mono text-white">
               {serviceRadiusKm} <span className="text-[12px]">KM</span>
@@ -179,9 +238,87 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
         </div>
       </div>
 
+      {/* 2. Operational Center Open / Closed Status Quick Bar */}
+      <div
+        id="recycler-center-status-card"
+        className={`p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 border-2 shadow-sm transition-all ${
+          centerIsOpen
+            ? 'bg-[#85f8c4]/15 border-[#006948] text-[#002114] dark:bg-[#042419] dark:text-[#85f8c4] dark:border-[#006948]'
+            : 'bg-[#ffdad6]/25 border-[#ba1a1a] text-[#410002] dark:bg-[#2c1515] dark:text-[#ffdad6] dark:border-[#ba1a1a]'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-[24px] shrink-0 shadow-sm ${
+              centerIsOpen
+                ? 'bg-[#006948] text-white'
+                : 'bg-[#ba1a1a] text-white'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[26px]">
+              {centerIsOpen ? 'store' : 'lock_clock'}
+            </span>
+          </div>
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[15px] font-black tracking-tight">
+                {centerIsOpen ? rc.centerStatusOpen : rc.centerStatusClosed}
+              </span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase flex items-center gap-1 ${
+                  centerIsOpen
+                    ? 'bg-[#006948] text-white'
+                    : 'bg-[#ba1a1a] text-white'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${centerIsOpen ? 'bg-[#85f8c4] animate-ping' : 'bg-white'}`} />
+                {centerIsOpen
+                  ? (language === 'mr' ? 'नकाशावर सक्रिय' : language === 'en' ? 'LIVE ON MAP' : 'नक्शे पर लाइव')
+                  : (language === 'mr' ? 'कबाडीवाल्यांसाठी बंद' : language === 'en' ? 'OFFLINE FOR KABADIWALA' : 'कबाड़ीवालों के लिए बंद')}
+              </span>
+            </div>
+            <p className="text-[12px] opacity-90 leading-tight mt-0.5">
+              {centerIsOpen ? rc.centerOpenNotice : rc.centerClosedNotice}
+            </p>
+          </div>
+        </div>
+
+        {/* Action Toggle Switch */}
+        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+          <button
+            id="btn-recycler-mark-open"
+            type="button"
+            onClick={() => handleToggleCenter(true)}
+            className={`flex-1 sm:flex-none h-10 px-4 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              centerIsOpen
+                ? 'bg-[#006948] text-white shadow-sm font-black border-2 border-[#006948]'
+                : 'bg-white/80 dark:bg-white/10 text-[#565e74] hover:text-[#191c1e] border border-[#bccac0]/60'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[16px]">check_circle</span>
+            <span>{language === 'mr' ? 'सुरू (OPEN)' : language === 'en' ? 'Mark OPEN' : 'खुला (OPEN)'}</span>
+          </button>
+
+          <button
+            id="btn-recycler-mark-closed"
+            type="button"
+            onClick={() => handleToggleCenter(false)}
+            className={`flex-1 sm:flex-none h-10 px-4 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              !centerIsOpen
+                ? 'bg-[#ba1a1a] text-white shadow-sm font-black border-2 border-[#ba1a1a]'
+                : 'bg-white/80 dark:bg-white/10 text-[#565e74] hover:text-[#ba1a1a] border border-[#bccac0]/60'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[16px]">cancel</span>
+            <span>{language === 'mr' ? 'बंद (CLOSED)' : language === 'en' ? 'Mark CLOSED' : 'बंद (CLOSED)'}</span>
+          </button>
+        </div>
+      </div>
+
       {/* 2. Facility Navigation Tab Bar (5 Pillars for Recycler Portal) */}
       <div className="flex items-center gap-1.5 p-1.5 bg-white dark:bg-[#131c24] rounded-2xl border-2 border-[#191c1e] shadow-sm overflow-x-auto scrollbar-none">
         <button
+          id="tab-recycler-leads"
           type="button"
           onClick={() => {
             triggerHaptic(15);
@@ -194,7 +331,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">hub</span>
-          <span>Incoming Leads & Lots</span>
+          <span>{rc.tabLeads}</span>
           {pendingLeadsCount > 0 && (
             <span className="w-5 h-5 rounded-full bg-[#ffdcc3] text-[#6e3900] text-[10px] font-bold flex items-center justify-center">
               {pendingLeadsCount}
@@ -203,6 +340,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
         </button>
 
         <button
+          id="tab-recycler-intake"
           type="button"
           onClick={() => {
             triggerHaptic(15);
@@ -215,10 +353,11 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">qr_code_scanner</span>
-          <span>QR Intake & Scale</span>
+          <span>{rc.tabIntake}</span>
         </button>
 
         <button
+          id="tab-recycler-rates"
           type="button"
           onClick={() => {
             triggerHaptic(15);
@@ -231,10 +370,11 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">currency_rupee</span>
-          <span>Rate Card & Bulk Premiums</span>
+          <span>{rc.tabRates}</span>
         </button>
 
         <button
+          id="tab-recycler-epr"
           type="button"
           onClick={() => {
             triggerHaptic(15);
@@ -247,10 +387,11 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">receipt_long</span>
-          <span>EPR Compliance Reports</span>
+          <span>{rc.tabEpr}</span>
         </button>
 
         <button
+          id="tab-recycler-compliance"
           type="button"
           onClick={() => {
             triggerHaptic(15);
@@ -263,7 +404,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">verified_user</span>
-          <span>Compliance & Gatekeeper</span>
+          <span>{rc.tabCompliance}</span>
         </button>
       </div>
 
@@ -315,6 +456,8 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
             onUpdateServiceRadius={setServiceRadiusKm}
             hasFleetPickup={hasFleetPickup}
             onToggleFleetPickup={setHasFleetPickup}
+            isCenterOpen={centerIsOpen}
+            onToggleCenterStatus={handleToggleCenter}
           />
         )}
       </div>

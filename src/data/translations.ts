@@ -91,6 +91,17 @@ export interface DashboardTranslations {
     callCollector: string;
     audioWelcomePrompt: string;
     audioScanInstruction: string;
+    centerStatusOpen: string;
+    centerStatusClosed: string;
+    toggleCenterOpen: string;
+    toggleCenterClose: string;
+    centerOpenNotice: string;
+    centerClosedNotice: string;
+    tabLeads: string;
+    tabIntake: string;
+    tabRates: string;
+    tabEpr: string;
+    tabCompliance: string;
   };
 
   // Bottom Nav labels
@@ -122,6 +133,9 @@ export interface DashboardTranslations {
     environmentalImpact: string;
     finalPayout: string;
     confirmHandover: string;
+    centerStatusOpen: string;
+    centerStatusClosed: string;
+    centerClosedWarning: string;
   };
 
   // Offline / Online Toast notifications
@@ -229,6 +243,17 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       audioWelcomePrompt:
         'रीसाइक्लर पोर्टल में आपका स्वागत है। कबाड़ीवाले का क्यूआर कोड स्कैन करें और लाइव खरीद दरें सेट करें।',
       audioScanInstruction: 'कबाड़ीवाला का क्यूआर कोड कैमरे के सामने रखें।',
+      centerStatusOpen: 'रीसाइक्लिंग केंद्र खुला है (OPEN)',
+      centerStatusClosed: 'रीसाइक्लिंग केंद्र बंद है (CLOSED)',
+      toggleCenterOpen: 'केंद्र चालू करें',
+      toggleCenterClose: 'केंद्र बंद करें',
+      centerOpenNotice: 'आपका खरीद केंद्र सक्रिय है। कबाड़ीवालों को केंद्र खुला दिखेगा।',
+      centerClosedNotice: 'आपका केंद्र वर्तमान में बंद है। कबाड़ीवालों को केंद्र बंद दिखेगा।',
+      tabLeads: 'इनकमिंग लॉट्स एवं लीड्स',
+      tabIntake: 'QR वजन कांटा एवं इनटेक',
+      tabRates: 'भाव सूची एवं बल्क प्रीमियम',
+      tabEpr: 'EPR अनुपालन रिपोर्ट',
+      tabCompliance: 'प्रमाणन एवं KYC',
     },
 
     nav: {
@@ -258,6 +283,9 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       environmentalImpact: 'इस हैंडओवर से 2.3 किलो हानिकारक भारी धातुएं सुरक्षित निस्तारित होंगी।',
       finalPayout: 'कुल बिक्री मूल्य (Final Payout)',
       confirmHandover: 'डील पक्की करें & हैंडओवर',
+      centerStatusOpen: 'खुला है (OPEN)',
+      centerStatusClosed: 'बंद है (CLOSED)',
+      centerClosedWarning: 'यह रीसाइक्लिंग केंद्र वर्तमान में बंद है। कृपया खुला अधिकृत केंद्र चुनें।',
     },
 
     offlineToast: {
@@ -364,6 +392,17 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       audioWelcomePrompt:
         'Welcome to the Recycler Portal. Scan kabadiwala QR codes and set live purchase rates.',
       audioScanInstruction: 'Hold the kabadiwala QR code properly in front of the camera.',
+      centerStatusOpen: 'Recycle Center: OPEN',
+      centerStatusClosed: 'Recycle Center: CLOSED',
+      toggleCenterOpen: 'Mark Center Open',
+      toggleCenterClose: 'Mark Center Closed',
+      centerOpenNotice: 'Your recycling center is OPEN. Collectors will see your center active for scrap handovers.',
+      centerClosedNotice: 'Your recycling center is CLOSED. Collectors will see your center marked closed.',
+      tabLeads: 'Incoming Leads & Lots',
+      tabIntake: 'QR Intake & Scale',
+      tabRates: 'Rate Card & Bulk Premiums',
+      tabEpr: 'EPR Compliance Reports',
+      tabCompliance: 'Compliance & KYC',
     },
 
     nav: {
@@ -393,6 +432,9 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       environmentalImpact: 'This handover will safely dispose of 2.3 kg of hazardous heavy metals.',
       finalPayout: 'Final Payout',
       confirmHandover: 'Confirm Deal & Handover',
+      centerStatusOpen: 'OPEN',
+      centerStatusClosed: 'CLOSED',
+      centerClosedWarning: 'This recycling center is currently CLOSED. Please select an OPEN certified recycler.',
     },
 
     offlineToast: {
@@ -499,6 +541,17 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       audioWelcomePrompt:
         'अधिकृत रिसायकलर पोर्टलमध्ये आपले स्वागत आहे. कबाडीवाल्याचे क्यूआर कोड स्कॅन करा आणि थेट खरेदी दर सेट करा.',
       audioScanInstruction: 'कबाडीवाल्याचा क्यूआर कोड कॅमेऱ्यासमोर व्यवस्थित धरा.',
+      centerStatusOpen: 'रिसायकलिंग केंद्र सुरू आहे (OPEN)',
+      centerStatusClosed: 'रिसायकलिंग केंद्र बंद आहे (CLOSED)',
+      toggleCenterOpen: 'केंद्र सुरू करा',
+      toggleCenterClose: 'केंद्र बंद करा',
+      centerOpenNotice: 'तुमचे खरेदी केंद्र सुरू आहे. कबाडीवाल्यांना केंद्र सुरू दिसेल.',
+      centerClosedNotice: 'तुमचे खरेदी केंद्र बंद आहे. कबाडीवाल्यांना केंद्र बंद दिसेल.',
+      tabLeads: 'येणारे लॉट्स आणि लीड्स',
+      tabIntake: 'QR वजन काटा आणि इनटेक',
+      tabRates: 'दर सूची आणि बल्क प्रीमियम',
+      tabEpr: 'EPR अनुपालन अहवाल',
+      tabCompliance: 'अनुपालन व KYC',
     },
 
     nav: {
@@ -528,6 +581,9 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
       environmentalImpact: 'या हँडओव्हरमुळे २.३ किलो हानिकारक जड धातूंची सुरक्षित विल्हेवाट लावली जाईल.',
       finalPayout: 'एकूण विक्री मूल्य (Final Payout)',
       confirmHandover: 'डील पक्की करा & हँडओव्हर',
+      centerStatusOpen: 'सुरू आहे (OPEN)',
+      centerStatusClosed: 'बंद आहे (CLOSED)',
+      centerClosedWarning: 'हे रिसायकलिंग केंद्र सध्या बंद आहे. कृपया सुरू असलेले अधिकृत केंद्र निवडा.',
     },
 
     offlineToast: {

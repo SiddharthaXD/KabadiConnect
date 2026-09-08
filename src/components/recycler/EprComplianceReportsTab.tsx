@@ -94,6 +94,8 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
       const msg =
         language === 'en'
           ? 'CPCB compliance CSV report downloaded successfully.'
+          : language === 'mr'
+          ? 'सरकारी CPCB अनुपालन CSV अहवाल यशस्वीरीत्या डाऊनलोड झाला.'
           : 'सरकारी CPCB अनुपालन CSV रिपोर्ट सफलतापूर्वक डाउनलोड हुई।';
       speakVernacular(msg, language);
     } catch (err) {
@@ -120,11 +122,13 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
               <h3 className="text-[17px] font-black text-[#191c1e] dark:text-[#ffffff]">
                 {language === 'en'
                   ? 'Extended Producer Responsibility (EPR) Target Engine'
+                  : language === 'mr'
+                  ? 'विस्तारित उत्पादक जबाबदारी (EPR) उद्दिष्ट इंजिन'
                   : 'विस्तारित उत्पादक उत्तरदायित्व (EPR) लक्ष्य इंजन'}
               </h3>
             </div>
             <span className="text-[12px] text-[#565e74] dark:text-[#94a3b8]">
-              Compliance Registry ID: {certificate.cpcbNumber}
+              {language === 'mr' ? 'अनुपालन नोंदणी क्रमांक:' : 'Compliance Registry ID:'} {certificate.cpcbNumber}
             </span>
           </div>
 
@@ -145,13 +149,13 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between text-[13px] font-bold">
             <span className="text-[#191c1e] dark:text-[#ffffff] flex items-center gap-1.5">
-              <span>Annual EPR Obligation Target:</span>
+              <span>{language === 'mr' ? 'वार्षिक EPR बंधन उद्दिष्ट:' : 'Annual EPR Obligation Target:'}</span>
               <span className="font-mono text-[#006948] dark:text-[#34d399]">
                 {currentTotalProcessedMT} MT / {targetMT} MT
               </span>
             </span>
             <span className="text-[#006948] dark:text-[#34d399] font-black font-mono">
-              {progressPercent}% FULFILLED
+              {progressPercent}% {language === 'mr' ? 'पूर्ण' : 'FULFILLED'}
             </span>
           </div>
 
@@ -163,8 +167,8 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
           </div>
 
           <div className="flex justify-between text-[11px] text-[#565e74] dark:text-[#94a3b8]">
-            <span>Base Q1: 45 MT</span>
-            <span>Target: {targetMT} Metric Tonnes / Year</span>
+            <span>{language === 'mr' ? 'बेस Q1: ४५ MT' : 'Base Q1: 45 MT'}</span>
+            <span>{language === 'mr' ? `उद्दिष्ट: ${targetMT} मेट्रिक टन / वर्ष` : `Target: ${targetMT} Metric Tonnes / Year`}</span>
           </div>
         </div>
 
@@ -172,7 +176,7 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
         <div className="grid grid-cols-3 gap-2.5 pt-1">
           <div className="p-3 bg-[#f7f9fb] dark:bg-[#0d141b] rounded-xl border border-[#bccac0]/40 dark:border-[#263849]">
             <span className="text-[10px] uppercase font-bold text-[#565e74] dark:text-[#94a3b8] block">
-              Audited Intake Lots
+              {language === 'mr' ? 'ऑडिट केलेले लॉट्स' : 'Audited Intake Lots'}
             </span>
             <span className="text-[18px] font-black font-mono text-[#191c1e] dark:text-[#ffffff]">
               {transactions.length}
@@ -181,7 +185,7 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
 
           <div className="p-3 bg-[#f7f9fb] dark:bg-[#0d141b] rounded-xl border border-[#bccac0]/40 dark:border-[#263849]">
             <span className="text-[10px] uppercase font-bold text-[#565e74] dark:text-[#94a3b8] block">
-              Certified Net Volume
+              {language === 'mr' ? 'प्रमाणित निव्वळ खंड' : 'Certified Net Volume'}
             </span>
             <span className="text-[18px] font-black font-mono text-[#006948] dark:text-[#34d399]">
               {totalProcuredKg.toFixed(1)} <span className="text-[11px]">KG</span>
@@ -190,7 +194,7 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
 
           <div className="p-3 bg-[#f7f9fb] dark:bg-[#0d141b] rounded-xl border border-[#bccac0]/40 dark:border-[#263849]">
             <span className="text-[10px] uppercase font-bold text-[#565e74] dark:text-[#94a3b8] block">
-              Total EPR Payout
+              {language === 'mr' ? 'एकूण EPR वाटप' : 'Total EPR Payout'}
             </span>
             <span className="text-[18px] font-black font-mono text-[#191c1e] dark:text-[#ffffff] truncate">
               ₹{totalValuation.toLocaleString('en-IN')}
@@ -216,10 +220,14 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
               </span>
               {language === 'en'
                 ? 'CPCB Form-2 E-Waste Traceability Ledger'
+                : language === 'mr'
+                ? 'CPCB फॉर्म-२ ई-कचरा ट्रेसिबिलिटी खातेवही'
                 : 'CPCB फॉर्म-2 ई-कचरा ट्रेसिबिलिटी लेज़र'}
             </h4>
             <span className="text-[11px] text-[#565e74] dark:text-[#94a3b8]">
-              Immutable audit log for Ministry of Mines & State Pollution Boards
+              {language === 'mr'
+                ? 'प्रदूषण नियंत्रण मंडळांसाठी अपरिवर्तनीय ऑडिट लॉग'
+                : 'Immutable audit log for Ministry of Mines & State Pollution Boards'}
             </span>
           </div>
 
@@ -231,7 +239,7 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
               className="h-10 px-4 bg-[#006948] hover:bg-[#005238] text-white rounded-xl font-bold text-[12px] flex items-center gap-1.5 shadow-2xs active:scale-95 transition-all cursor-pointer"
             >
               <span className="material-symbols-outlined text-[16px]">file_download</span>
-              <span>Export CSV</span>
+              <span>{language === 'mr' ? 'CSV निर्यात करा' : 'Export CSV'}</span>
             </button>
 
             <button
@@ -241,7 +249,7 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
               className="h-10 px-3.5 bg-white dark:bg-[#0d141b] text-[#191c1e] dark:text-[#ffffff] hover:bg-[#f2f4f6] rounded-xl font-bold text-[12px] flex items-center gap-1.5 border border-[#bccac0]/60 dark:border-[#33485c] shadow-2xs active:scale-95 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[16px]">print</span>
-              <span>Print Form-2</span>
+              <span>{language === 'mr' ? 'फॉर्म-२ प्रिंट करा' : 'Print Form-2'}</span>
             </button>
           </div>
         </div>
@@ -255,7 +263,13 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by Lot ID, Collector Name, CPCB ID, or Scrap Category..."
+            placeholder={
+              language === 'mr'
+                ? 'लॉट आयडी, कबाडीवाल्याचे नाव, CPCB आयडी किंवा स्क्रॅप प्रकाराने शोधा...'
+                : language === 'en'
+                ? 'Search by Lot ID, Collector Name, CPCB ID, or Scrap Category...'
+                : 'लॉट ID, कबाड़ीवाले का नाम, CPCB ID या स्क्रैप श्रेणी द्वारा खोजें...'
+            }
             className="w-full h-10 pl-9 pr-3 bg-[#f7f9fb] dark:bg-[#0d141b] border border-[#bccac0]/60 dark:border-[#33485c] rounded-xl text-[12px] text-[#191c1e] dark:text-[#ffffff] focus:outline-hidden"
           />
         </div>
@@ -265,13 +279,13 @@ export const EprComplianceReportsTab: React.FC<EprComplianceReportsTabProps> = (
           <table className="w-full text-left border-collapse min-w-[650px]">
             <thead>
               <tr className="border-b border-[#bccac0]/40 dark:border-[#263849] text-[10px] uppercase font-bold text-[#565e74] dark:text-[#94a3b8] bg-[#f7f9fb] dark:bg-[#0d141b]">
-                <th className="py-2.5 px-3">Lot & Timestamp</th>
-                <th className="py-2.5 px-3">Collector CPCB ID</th>
-                <th className="py-2.5 px-3">Material Category</th>
-                <th className="py-2.5 px-3 text-right">Net Weight (KG)</th>
-                <th className="py-2.5 px-3 text-right">Payout (INR)</th>
-                <th className="py-2.5 px-3">GPS Geotag</th>
-                <th className="py-2.5 px-3 text-right">EPR Manifest Hash</th>
+                <th className="py-2.5 px-3">{language === 'mr' ? 'लॉट व वेळ' : 'Lot & Timestamp'}</th>
+                <th className="py-2.5 px-3">{language === 'mr' ? 'कबाडीवाला CPCB ID' : 'Collector CPCB ID'}</th>
+                <th className="py-2.5 px-3">{language === 'mr' ? 'साहित्य प्रकार' : 'Material Category'}</th>
+                <th className="py-2.5 px-3 text-right">{language === 'mr' ? 'निव्वळ वजन (KG)' : 'Net Weight (KG)'}</th>
+                <th className="py-2.5 px-3 text-right">{language === 'mr' ? 'रक्कम (₹)' : 'Payout (INR)'}</th>
+                <th className="py-2.5 px-3">{language === 'mr' ? 'GPS जिओटॅग' : 'GPS Geotag'}</th>
+                <th className="py-2.5 px-3 text-right">{language === 'mr' ? 'EPR मॅनिफेस्ट हॅश' : 'EPR Manifest Hash'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#bccac0]/30 dark:divide-[#263849] text-[12px]">

@@ -11,6 +11,8 @@ interface ComplianceVerificationTabProps {
   onUpdateServiceRadius: (radius: number) => void;
   hasFleetPickup: boolean;
   onToggleFleetPickup: (enabled: boolean) => void;
+  isCenterOpen?: boolean;
+  onToggleCenterStatus?: (isOpen: boolean) => void;
 }
 
 const ALL_MATERIALS = [
@@ -31,6 +33,8 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
   onUpdateServiceRadius,
   hasFleetPickup,
   onToggleFleetPickup,
+  isCenterOpen = true,
+  onToggleCenterStatus,
 }) => {
   const [certNumber, setCertNumber] = useState(certificate.cpcbNumber);
   const [spcbState, setSpcbState] = useState(certificate.spcbState);
@@ -143,18 +147,24 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
             <h4 className="text-[16px] font-black text-[#191c1e] dark:text-[#ffffff]">
               {language === 'en'
                 ? '1. License & Registration Certificate'
+                : language === 'mr'
+                ? '१. परवाना व नोंदणी प्रमाणपत्र'
                 : '1. लाइसेंस व पंजीकरण प्रमाणपत्र'}
             </h4>
           </div>
           <span className="text-[11px] font-bold text-[#565e74] dark:text-[#94a3b8]">
-            E-Waste Rules 2022
+            {language === 'mr' ? 'ई-कचरा नियम २०२२' : 'E-Waste Rules 2022'}
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div>
             <label className="text-[12px] font-bold text-[#191c1e] dark:text-[#f1f5f9] block mb-1">
-              {language === 'en' ? 'CPCB / EPR Registration Number' : 'CPCB / EPR पंजीकरण संख्या'}
+              {language === 'en'
+                ? 'CPCB / EPR Registration Number'
+                : language === 'mr'
+                ? 'CPCB / EPR नोंदणी क्रमांक'
+                : 'CPCB / EPR पंजीकरण संख्या'}
             </label>
             <input
               type="text"
@@ -167,20 +177,28 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
 
           <div>
             <label className="text-[12px] font-bold text-[#191c1e] dark:text-[#f1f5f9] block mb-1">
-              {language === 'en' ? 'Issuing State Pollution Board' : 'जारीकर्ता राज्य प्रदूषण बोर्ड'}
+              {language === 'en'
+                ? 'Issuing State Pollution Board'
+                : language === 'mr'
+                ? 'जारी करणारे राज्य प्रदूषण मंडळ'
+                : 'जारीकर्ता राज्य प्रदूषण बोर्ड'}
             </label>
             <input
               type="text"
               value={spcbState}
               onChange={(e) => setSpcbState(e.target.value)}
               className="w-full h-11 px-3 bg-[#f7f9fb] dark:bg-[#0d141b] border border-[#bccac0]/60 dark:border-[#33485c] rounded-xl text-[13px] font-bold text-[#191c1e] dark:text-[#ffffff] focus:border-[#006948] focus:outline-hidden"
-              placeholder="e.g. Delhi Pollution Control Committee (DPCC)"
+              placeholder="e.g. Maharashtra Pollution Control Board (MPCB)"
             />
           </div>
 
           <div>
             <label className="text-[12px] font-bold text-[#191c1e] dark:text-[#f1f5f9] block mb-1">
-              {language === 'en' ? 'Validity Expiry Date' : 'वैधता समाप्ति तिथि'}
+              {language === 'en'
+                ? 'Validity Expiry Date'
+                : language === 'mr'
+                ? 'वैधता समाप्ती तारीख'
+                : 'वैधता समाप्ति तिथि'}
             </label>
             <input
               type="text"
@@ -193,7 +211,11 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
 
           <div>
             <label className="text-[12px] font-bold text-[#191c1e] dark:text-[#f1f5f9] block mb-1">
-              {language === 'en' ? 'Authorized Annual Capacity (MT/Year)' : 'अधिकृत वार्षिक क्षमता (MT/वर्ष)'}
+              {language === 'en'
+                ? 'Authorized Annual Capacity (MT/Year)'
+                : language === 'mr'
+                ? 'अधिकृत वार्षिक क्षमता (MT/वर्ष)'
+                : 'अधिकृत वार्षिक क्षमता (MT/वर्ष)'}
             </label>
             <div className="relative">
               <input
@@ -221,14 +243,24 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
               </span>
               <span className="text-[11px] text-[#006948] dark:text-[#34d399] font-semibold flex items-center gap-1">
                 <span className="material-symbols-outlined text-[14px]">check_circle</span>
-                {language === 'en' ? 'Verified Government Document (2.4 MB)' : 'सत्यापित सरकारी दस्तावेज (2.4 MB)'}
+                {language === 'en'
+                  ? 'Verified Government Document (2.4 MB)'
+                  : language === 'mr'
+                  ? 'पडताळणी झालेले अधिकृत दस्तऐवज (२.४ MB)'
+                  : 'सत्यापित सरकारी दस्तावेज (2.4 MB)'}
               </span>
             </div>
           </div>
 
           <label className="px-4 py-2 bg-white dark:bg-[#0d141b] hover:bg-[#85f8c4]/30 text-[#006948] dark:text-[#34d399] rounded-xl font-bold text-[12px] border border-[#006948]/40 shadow-xs cursor-pointer active:scale-95 transition-all shrink-0 flex items-center gap-1.5">
             <span className="material-symbols-outlined text-[16px]">upload</span>
-            <span>{language === 'en' ? 'Upload New Certificate' : 'नया प्रमाणपत्र अपलोड करें'}</span>
+            <span>
+              {language === 'en'
+                ? 'Upload New Certificate'
+                : language === 'mr'
+                ? 'नवीन प्रमाणपत्र अपलोड करा'
+                : 'नया प्रमाणपत्र अपलोड करें'}
+            </span>
             <input type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileUpload} className="hidden" />
           </label>
         </div>
@@ -242,17 +274,23 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
               checklist_rtl
             </span>
             <h4 className="text-[16px] font-black text-[#191c1e] dark:text-[#ffffff]">
-              {language === 'en' ? '2. Licensed Material Intake Scope' : '2. अधिकृत सामग्री चयन (Material Scope)'}
+              {language === 'en'
+                ? '2. Licensed Material Intake Scope'
+                : language === 'mr'
+                ? '२. अधिकृत साहित्य संकलन कक्षा'
+                : '2. अधिकृत सामग्री चयन (Material Scope)'}
             </h4>
           </div>
           <span className="text-[11px] font-bold text-[#006948] dark:text-[#34d399]">
-            {selectedMaterials.length} / {ALL_MATERIALS.length} {language === 'en' ? 'Enabled' : 'स्वीकृत'}
+            {selectedMaterials.length} / {ALL_MATERIALS.length} {language === 'en' ? 'Enabled' : language === 'mr' ? 'सक्रिय' : 'स्वीकृत'}
           </span>
         </div>
 
         <p className="text-[12px] text-[#565e74] dark:text-[#94a3b8]">
           {language === 'en'
             ? 'Select only materials your facility is legally permitted and equipped to process.'
+            : language === 'mr'
+            ? 'फक्त तेच साहित्य निवडा जे स्वीकारण्यासाठी तुमची सुविधा कायदेशीररित्या अधिकृत आहे.'
             : 'केवल वही सामग्री चुनें जिसे संसाधित करने के लिए आपकी इकाई सरकारी रूप से अधिकृत है।'}
         </p>
 
@@ -280,7 +318,9 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
                     {language === 'en' ? mat.nameEn : language === 'mr' ? mat.nameMr : mat.nameHi}
                   </span>
                   <span className="text-[10px] text-[#565e74] dark:text-[#94a3b8] mt-0.5">
-                    {isSelected ? '✓ Processing Authorized' : '✕ Excluded'}
+                    {isSelected
+                      ? (language === 'mr' ? '✓ प्रक्रिया अधिकृत' : '✓ Processing Authorized')
+                      : (language === 'mr' ? '✕ वगळले' : '✕ Excluded')}
                   </span>
                 </div>
               </div>
@@ -289,7 +329,86 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
         </div>
       </div>
 
-      {/* 3. Service Area & Logistics Radius */}
+      {/* 3. Facility Operational Status (Open / Closed for Intake) */}
+      <div className={`rounded-2xl p-4 sm:p-5 shadow-sm border-2 transition-all flex flex-col gap-3 ${
+        isCenterOpen
+          ? 'bg-white dark:bg-[#131c24] border-[#006948]'
+          : 'bg-[#ffdad6]/20 dark:bg-[#2c1515] border-[#ba1a1a]'
+      }`}>
+        <div className="flex items-center justify-between border-b border-[#bccac0]/40 dark:border-[#263849] pb-3">
+          <div className="flex items-center gap-2">
+            <span className={`material-symbols-outlined text-[24px] ${isCenterOpen ? 'text-[#006948] dark:text-[#34d399]' : 'text-[#ba1a1a]'}`}>
+              {isCenterOpen ? 'store' : 'storefront'}
+            </span>
+            <div className="flex flex-col">
+              <h4 className="text-[16px] font-black text-[#191c1e] dark:text-[#ffffff]">
+                {language === 'en' ? '3. Facility Open / Closed Status' : language === 'mr' ? '३. केंद्र सुरू / बंद स्थिती' : '3. रीसाइक्लिंग केंद्र चालू / बंद स्थिति'}
+              </h4>
+              <span className="text-[11px] text-[#565e74] dark:text-[#94a3b8]">
+                {language === 'en'
+                  ? 'Controls whether local collectors can see and deliver scrap to your facility'
+                  : 'निर्धारित करें कि कबाड़ीवालों को आपका केंद्र चालू दिखना चाहिए या बंद'}
+              </span>
+            </div>
+          </div>
+          <span className={`px-2.5 py-1 rounded-full text-[11px] font-black uppercase flex items-center gap-1 ${
+            isCenterOpen
+              ? 'bg-[#85f8c4] text-[#002114]'
+              : 'bg-[#ffdad6] text-[#ba1a1a]'
+          }`}>
+            <span className={`w-2 h-2 rounded-full ${isCenterOpen ? 'bg-[#006948] animate-pulse' : 'bg-[#ba1a1a]'}`} />
+            {isCenterOpen
+              ? (language === 'mr' ? 'सुरू (OPEN)' : language === 'en' ? 'OPEN' : 'खुला है (OPEN)')
+              : (language === 'mr' ? 'बंद (CLOSED)' : language === 'en' ? 'CLOSED' : 'बंद है (CLOSED)')}
+          </span>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+          <p className="text-[12px] text-[#565e74] dark:text-[#94a3b8] leading-relaxed">
+            {isCenterOpen
+              ? (language === 'en'
+                  ? 'Your center is currently ACTIVE and marked OPEN. Kabadiwalas can view your scrap rates, request handovers, and drop off e-waste.'
+                  : language === 'mr'
+                  ? 'तुमचे केंद्र सध्या सुरू (OPEN) आहे. कबाडीवाले तुमचे खरेदी भाव पाहू शकतात आणि ई-कचरा घेऊन येऊ शकतात.'
+                  : 'आपका केंद्र वर्तमान में चालू (OPEN) है। कबाड़ीवाले आपके भाव देख सकते हैं और ई-वेस्ट हैंडओवर कर सकते हैं।')
+              : (language === 'en'
+                  ? 'Your center is currently CLOSED. Kabadiwalas will see your center marked CLOSED and will not be able to send new pickup requests.'
+                  : language === 'mr'
+                  ? 'तुमचे केंद्र सध्या बंद (CLOSED) आहे. कबाडीवाल्यांना केंद्र बंद दिसेल.'
+                  : 'आपका केंद्र वर्तमान में बंद (CLOSED) है। कबाड़ीवालों को केंद्र बंद दिखेगा।')}
+          </p>
+
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => onToggleCenterStatus && onToggleCenterStatus(true)}
+              className={`flex-1 sm:flex-none px-4 h-10 rounded-xl text-[12px] font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                isCenterOpen
+                  ? 'bg-[#006948] text-white shadow-sm'
+                  : 'bg-[#e6e8ea] dark:bg-[#1f2937] text-[#565e74] hover:text-[#191c1e]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">check_circle</span>
+              <span>{language === 'mr' ? 'सुरू ठेवा' : language === 'en' ? 'Mark Open' : 'चालू करें'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onToggleCenterStatus && onToggleCenterStatus(false)}
+              className={`flex-1 sm:flex-none px-4 h-10 rounded-xl text-[12px] font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                !isCenterOpen
+                  ? 'bg-[#ba1a1a] text-white shadow-sm'
+                  : 'bg-[#e6e8ea] dark:bg-[#1f2937] text-[#565e74] hover:text-[#ba1a1a]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">cancel</span>
+              <span>{language === 'mr' ? 'बंद करा' : language === 'en' ? 'Mark Closed' : 'बंद करें'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Service Area & Logistics Radius */}
       <div className="bg-white dark:bg-[#131c24] rounded-2xl p-4 sm:p-5 shadow-sm border-2 border-[#191c1e] flex flex-col gap-4">
         <div className="flex items-center justify-between border-b border-[#bccac0]/40 dark:border-[#263849] pb-3">
           <div className="flex items-center gap-2">
@@ -297,18 +416,24 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
               radar
             </span>
             <h4 className="text-[16px] font-black text-[#191c1e] dark:text-[#ffffff]">
-              {language === 'en' ? '3. Service Area & Logistics Matchmaking' : '3. सेवा क्षेत्र एवं लॉजिस्टिक्स दायरा'}
+              {language === 'en'
+                ? '4. Service Area & Logistics Matchmaking'
+                : language === 'mr'
+                ? '४. सेवा क्षेत्र आणि लॉजिस्टिक्स कार्यकक्षा'
+                : '4. सेवा क्षेत्र एवं लॉजिस्टिक्स दायरा'}
             </h4>
           </div>
           <span className="text-[12px] font-black text-[#006948] dark:text-[#34d399]">
-            {serviceRadiusKm} KM RADIUS
+            {serviceRadiusKm} {language === 'mr' ? 'किमी कार्यकक्षा' : 'KM RADIUS'}
           </span>
         </div>
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between text-[12px] font-bold text-[#565e74] dark:text-[#94a3b8]">
-            <span>{language === 'en' ? 'Operating Pickup Radius' : 'पिकअप दायरा'}</span>
-            <span className="text-[#191c1e] dark:text-[#ffffff]">{serviceRadiusKm} km around {profile.zone}</span>
+            <span>{language === 'en' ? 'Operating Pickup Radius' : language === 'mr' ? 'पिकअप कार्यकक्षा' : 'पिकअप दायरा'}</span>
+            <span className="text-[#191c1e] dark:text-[#ffffff]">
+              {serviceRadiusKm} {language === 'mr' ? `किमी (${profile.zone || 'परिसर'})` : `km around ${profile.zone}`}
+            </span>
           </div>
           <input
             type="range"
@@ -323,9 +448,9 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
             className="w-full accent-[#006948] cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-[#565e74] dark:text-[#94a3b8]">
-            <span>5 km (Hyperlocal)</span>
-            <span>25 km (City-wide)</span>
-            <span>50 km (NCR/Region)</span>
+            <span>{language === 'mr' ? '५ किमी (स्थानिक)' : '5 km (Hyperlocal)'}</span>
+            <span>{language === 'mr' ? '२५ किमी (शहर)' : '25 km (City-wide)'}</span>
+            <span>{language === 'mr' ? '५० किमी (प्रादेशिक)' : '50 km (NCR/Region)'}</span>
           </div>
         </div>
 
@@ -336,10 +461,18 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
             </div>
             <div>
               <span className="text-[13px] font-bold text-[#191c1e] dark:text-[#ffffff] block">
-                {language === 'en' ? 'Active Pickup Fleet Available' : 'सक्रिय पिकअप वैन बेड़ा उपलब्ध'}
+                {language === 'en'
+                  ? 'Active Pickup Fleet Available'
+                  : language === 'mr'
+                  ? 'सक्रिय पिकअप वाहन उपलब्ध'
+                  : 'सक्रिय पिकअप वैन बेड़ा उपलब्ध'}
               </span>
               <span className="text-[11px] text-[#565e74] dark:text-[#94a3b8]">
-                {language === 'en' ? 'Dispatches van within 15-30 mins for lots >20kg' : '20 किलो से अधिक के लॉट के लिए वैन तत्काल भेजी जाएगी'}
+                {language === 'en'
+                  ? 'Dispatches van within 15-30 mins for lots >20kg'
+                  : language === 'mr'
+                  ? '२० किलोपेक्षा जास्त मालासाठी १५-३० मिनिटांत वाहन पाठवले जाईल'
+                  : '20 किलो से अधिक के लॉट के लिए वैन तत्काल भेजी जाएगी'}
               </span>
             </div>
           </div>
@@ -371,7 +504,13 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
           className="w-full sm:w-auto px-6 h-12 bg-[#006948] hover:bg-[#005238] text-white font-black text-[14px] rounded-xl shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
           <span className="material-symbols-outlined text-[20px]">save</span>
-          <span>{language === 'en' ? 'Save & Sync Compliance Profile' : 'अनुपालन प्रोफाइल सुरक्षित करें'}</span>
+          <span>
+            {language === 'en'
+              ? 'Save & Sync Compliance Profile'
+              : language === 'mr'
+              ? 'अनुपालन प्रोफाइल जतन करा'
+              : 'अनुपालन प्रोफाइल सुरक्षित करें'}
+          </span>
         </button>
       </div>
     </div>

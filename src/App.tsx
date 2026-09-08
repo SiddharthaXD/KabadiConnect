@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ScreenName, Language, ScrapItem, Recycler, Transaction, UserRole, UserProfile } from './types';
-import { SCRAP_ITEMS, INITIAL_TRANSACTIONS, DEFAULT_KABADIWALA_PROFILE, DEFAULT_RECYCLER_PROFILE } from './data/scrapData';
+import { SCRAP_ITEMS, INITIAL_TRANSACTIONS, DEFAULT_KABADIWALA_PROFILE, DEFAULT_RECYCLER_PROFILE, RECYCLERS } from './data/scrapData';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { HomeDashboard } from './components/HomeDashboard';
@@ -42,6 +42,7 @@ export default function App() {
   // Transactions state
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [activeReceipt, setActiveReceipt] = useState<Transaction>(INITIAL_TRANSACTIONS[0]);
+  const [recyclersList, setRecyclersList] = useState<Recycler[]>(RECYCLERS);
 
   // Online & Sync state
   const [isOnline, setIsOnline] = useState<boolean>(true);
@@ -219,6 +220,18 @@ export default function App() {
     );
   };
 
+  // Recycler toggles their center open or closed
+  const handleToggleCenterStatus = (isOpen: boolean) => {
+    setUserProfile((prev) => ({ ...prev, isOpen }));
+    setRecyclersList((prev) =>
+      prev.map((rec) =>
+        rec.id === 'rec-1' || rec.cpcbId === userProfile.cpcbId
+          ? { ...rec, isOpen }
+          : rec
+      )
+    );
+  };
+
   // From Home or List: select item for weighing
   const handleSelectItemForWeighing = (item: ScrapItem, initialWeight: number = 15.0) => {
     setSelectedScrapItem(item);
@@ -353,6 +366,8 @@ export default function App() {
               setCurrentScreen('login');
             }}
             onUpdateRate={handleUpdateRate}
+            isCenterOpen={userProfile.isOpen !== false}
+            onToggleCenterStatus={handleToggleCenterStatus}
           />
         )}
 
@@ -396,6 +411,7 @@ export default function App() {
             initialWeight={weighingWeight}
             onConfirmDeal={handleConfirmDeal}
             language={language}
+            recyclers={recyclersList}
           />
         )}
 

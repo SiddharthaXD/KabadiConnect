@@ -13,12 +13,22 @@ export const DEFAULT_KABADIWALA_PROFILE: UserProfile = {
 export const DEFAULT_RECYCLER_PROFILE: UserProfile = {
   role: 'recycler',
   name: 'राजेश कुमार शर्मा',
+  nameHi: 'राजेश कुमार शर्मा',
+  nameEn: 'Rajesh Kumar Sharma',
+  nameMr: 'राजेश कुमार शर्मा',
   phone: '+91 98110 55443',
-  businessName: 'ग्रीनटेक ऑथराइज़्ड रिसाइक्लर्स Pvt Ltd',
+  businessName: 'ग्रीनटेक ऑथराइज़्ड रीसाइक्लर्स प्रा. लि.',
+  businessNameHi: 'ग्रीनटेक ऑथराइज़्ड रीसाइक्लर्स प्रा. लि.',
+  businessNameEn: 'GreenTech Authorized Recyclers Pvt Ltd',
+  businessNameMr: 'ग्रीनटेक अधिकृत रिसायकलर्स प्रा. लि.',
   cpcbId: 'CPCB-DL-8891-EW',
   zone: 'ओखला फेज-2 रीसाइक्लिंग हब, दिल्ली',
+  zoneHi: 'ओखला फेज-2 रीसाइक्लिंग हब, दिल्ली',
+  zoneEn: 'Okhla Phase-2 Recycling Hub, New Delhi',
+  zoneMr: 'ओखला फेज-२ रिसायकलिंग हब, नवी दिल्ली',
   avatarInitials: 'GR',
   verifiedBadge: 'CPCB अधिकृत रिसाइक्लर',
+  isOpen: true,
 };
 
 export const SCRAP_ITEMS: ScrapItem[] = [
@@ -93,11 +103,13 @@ export const WEIGHING_PCB_IMG =
 export const RECYCLERS: Recycler[] = [
   {
     id: 'greentech-recyclers',
-    nameHi: 'ग्रीनटेक ऑथराइज़्ड रिसाइक्लर्स',
-    nameEn: 'Greentech Recyclers Pvt Ltd',
+    nameHi: 'ग्रीनटेक ऑथराइज़्ड रीसाइक्लर्स',
+    nameEn: 'GreenTech Authorized Recyclers Pvt Ltd',
+    nameMr: 'ग्रीनटेक अधिकृत रिसायकलर्स प्रा. लि.',
     cpcbId: 'DL-8891',
     addressHi: 'ओखला फेज-2, दिल्ली',
     addressEn: 'Okhla Phase-2, New Delhi',
+    addressMr: 'ओखला फेज-२, नवी दिल्ली',
     distanceKm: 1.8,
     rating: 4.8,
     pickupsCount: 240,
@@ -105,14 +117,17 @@ export const RECYCLERS: Recycler[] = [
     phone: '+91 98110 24890',
     isGovtAuthorized: true,
     vanArrivalMins: 15,
+    isOpen: true,
   },
   {
     id: 'eco-waste-solution',
     nameHi: 'इको-वेस्ट सॉल्यूशन',
     nameEn: 'Eco-Waste Solution Pvt Ltd',
+    nameMr: 'इको-वेस्ट सोल्युशन प्रा. लि.',
     cpcbId: 'DL-4412',
     addressHi: 'मयूर विहार, दिल्ली',
     addressEn: 'Mayur Vihar, New Delhi',
+    addressMr: 'मयूर विहार, नवी दिल्ली',
     distanceKm: 3.2,
     rating: 4.6,
     pickupsCount: 120,
@@ -120,6 +135,7 @@ export const RECYCLERS: Recycler[] = [
     phone: '+91 98730 55120',
     isGovtAuthorized: true,
     vanArrivalMins: 25,
+    isOpen: true,
   },
 ];
 
