@@ -60,30 +60,32 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           </span>
         </button>
 
-        {/* Ledger / Khata */}
-        <button
-          id="nav-ledger"
-          onClick={() => {
-            triggerHaptic(20);
-            onNavigate('ledger');
-          }}
-          className={`flex flex-col items-center justify-center min-w-[72px] py-1 gap-0.5 transition-colors ${
-            isLedgerActive
-              ? 'text-[#006948] dark:text-[#34d399] font-bold'
-              : 'text-[#565e74] dark:text-[#94a3b8] hover:text-[#191c1e] dark:hover:text-[#ffffff]'
-          }`}
-        >
-          <span
-            className="material-symbols-outlined text-[26px]"
-            style={{ fontVariationSettings: isLedgerActive ? "'FILL' 1" : "'FILL' 0" }}
+        {/* Ledger / Khata - Shown for Kabadiwala, hidden for Recycler */}
+        {!isRecycler && (
+          <button
+            id="nav-ledger"
+            onClick={() => {
+              triggerHaptic(20);
+              onNavigate('ledger');
+            }}
+            className={`flex flex-col items-center justify-center min-w-[72px] py-1 gap-0.5 transition-colors ${
+              isLedgerActive
+                ? 'text-[#006948] dark:text-[#34d399] font-bold'
+                : 'text-[#565e74] dark:text-[#94a3b8] hover:text-[#191c1e] dark:hover:text-[#ffffff]'
+            }`}
           >
-            receipt_long
-          </span>
-          <span className="text-[14px] font-bold leading-none font-['Space_Grotesk']">
-            {t.ledger}
-          </span>
-          <span className="text-[10px] leading-none opacity-80">Ledger</span>
-        </button>
+            <span
+              className="material-symbols-outlined text-[26px]"
+              style={{ fontVariationSettings: isLedgerActive ? "'FILL' 1" : "'FILL' 0" }}
+            >
+              receipt_long
+            </span>
+            <span className="text-[14px] font-bold leading-none font-['Space_Grotesk']">
+              {t.ledger}
+            </span>
+            <span className="text-[10px] leading-none opacity-80">Ledger</span>
+          </button>
+        )}
 
         {/* Support */}
         <button

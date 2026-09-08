@@ -65,8 +65,20 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     };
 
     recognition.onerror = (event: any) => {
-      console.error('Speech recognition error', event.error);
+      console.warn('Speech recognition status/error:', event.error);
       setIsListening(false);
+      if (event.error === 'network' || (typeof navigator !== 'undefined' && !navigator.onLine)) {
+        // Voice assistance feedback for offline mode
+        speakVernacular(
+          language === 'mr'
+            ? 'ऑफलाइन मोडमध्ये वरील मजकूर निवडा किंवा टाईप करून आवाज ऐका.'
+            : language === 'hi'
+            ? 'ऑफ़लाइन मोड में टेक्स्ट चुनें या बोलकर सुनने के लिए प्ले दबाएं।'
+            : 'In offline mode, select preset voice cards or use text to speech.',
+          language,
+          true
+        );
+      }
     };
 
     recognition.onend = () => {

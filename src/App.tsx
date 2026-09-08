@@ -425,14 +425,6 @@ export default function App() {
         {currentScreen === 'support' && (
           <SupportScreen
             language={language}
-            transactions={transactions}
-            isOnline={isOnline}
-            onImportTransactions={(imported) => {
-              setTransactions(imported);
-              if (imported.length > 0) {
-                setActiveReceipt(imported[0]);
-              }
-            }}
             onResetData={() => {
               setTransactions(INITIAL_TRANSACTIONS);
               setActiveReceipt(INITIAL_TRANSACTIONS[0]);

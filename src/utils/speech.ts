@@ -12,7 +12,7 @@ export function triggerHaptic(pattern: number | number[] = 30) {
 
 /**
  * Play a clean, pleasant notification chime via Web Audio API
- * Provides instant auditory confirmation of audio activation
+ * Operates 100% offline and on-device without internet access
  */
 export function playAudioChime(freq1: number = 523.25, freq2: number = 659.25) {
   if (typeof window === 'undefined') return;
@@ -55,29 +55,39 @@ export function playAudioChime(freq1: number = 523.25, freq2: number = 659.25) {
 
 let cachedVoices: SpeechSynthesisVoice[] = [];
 
+function loadVoices(): SpeechSynthesisVoice[] {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return [];
+  const voices = window.speechSynthesis.getVoices();
+  if (voices && voices.length > 0) {
+    cachedVoices = voices;
+  }
+  return cachedVoices.length > 0 ? cachedVoices : voices;
+}
+
 if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-  cachedVoices = window.speechSynthesis.getVoices();
+  loadVoices();
   window.speechSynthesis.onvoiceschanged = () => {
-    cachedVoices = window.speechSynthesis.getVoices();
+    loadVoices();
   };
 }
 
 /**
  * Intelligent voice selection tailored for Marathi, Hindi, and English
+ * Prioritizes local on-device offline voices when offline or online
  */
 function findBestVoice(lang: Language): SpeechSynthesisVoice | null {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
 
-  const voices =
-    cachedVoices && cachedVoices.length > 0
-      ? cachedVoices
-      : window.speechSynthesis.getVoices();
-
+  const voices = loadVoices();
   if (!voices || voices.length === 0) return null;
+
+  // Filter for local offline service voices if available
+  const localVoices = voices.filter((v) => v.localService === true);
+  const pool = localVoices.length > 0 ? [...localVoices, ...voices] : voices;
 
   if (lang === 'mr') {
     // 1st choice: Native Marathi voice
-    const mrVoice = voices.find(
+    const mrVoice = pool.find(
       (v) =>
         v.lang.toLowerCase().startsWith('mr') ||
         v.name.toLowerCase().includes('marathi') ||
@@ -86,7 +96,7 @@ function findBestVoice(lang: Language): SpeechSynthesisVoice | null {
     if (mrVoice) return mrVoice;
 
     // 2nd choice: Indian Devanagari Hindi voice (pronounces Marathi Devanagari text accurately)
-    const hiVoice = voices.find(
+    const hiVoice = pool.find(
       (v) =>
         v.lang.toLowerCase().startsWith('hi') ||
         v.name.toLowerCase().includes('hindi') ||
@@ -95,13 +105,13 @@ function findBestVoice(lang: Language): SpeechSynthesisVoice | null {
     if (hiVoice) return hiVoice;
 
     // 3rd choice: Any Indian English voice
-    const inVoice = voices.find(
+    const inVoice = pool.find(
       (v) => v.lang.toLowerCase().includes('-in') || v.name.toLowerCase().includes('india')
     );
     if (inVoice) return inVoice;
   } else if (lang === 'hi') {
     // 1st choice: Hindi voice
-    const hiVoice = voices.find(
+    const hiVoice = pool.find(
       (v) =>
         v.lang.toLowerCase().startsWith('hi') ||
         v.name.toLowerCase().includes('hindi') ||
@@ -110,22 +120,26 @@ function findBestVoice(lang: Language): SpeechSynthesisVoice | null {
     if (hiVoice) return hiVoice;
 
     // 2nd choice: Indian English voice
-    const inVoice = voices.find(
+    const inVoice = pool.find(
       (v) => v.lang.toLowerCase().includes('-in') || v.name.toLowerCase().includes('india')
     );
     if (inVoice) return inVoice;
   } else {
     // 1st choice: Indian English or general English
-    const enInVoice = voices.find((v) => v.lang.toLowerCase() === 'en-in');
+    const enInVoice = pool.find((v) => v.lang.toLowerCase() === 'en-in');
     if (enInVoice) return enInVoice;
 
-    const enVoice = voices.find((v) => v.lang.toLowerCase().startsWith('en'));
+    const enVoice = pool.find((v) => v.lang.toLowerCase().startsWith('en'));
     if (enVoice) return enVoice;
   }
 
-  return voices[0] || null;
+  return pool[0] || null;
 }
 
+/**
+ * Universal Vernacular Speech Engine
+ * Operates uniformly in Online & Offline modes using local device synthesis
+ */
 export function speakVernacular(
   text: string,
   lang: Language = 'hi',
@@ -147,13 +161,18 @@ export function speakVernacular(
       playAudioChime();
     }
 
+    // Force cancel previous utterance to prevent queue stalls
     window.speechSynthesis.cancel();
+    
+    // Ensure voices are freshly queried on demand
+    loadVoices();
+
     const utterance = new SpeechSynthesisUtterance(text);
 
     // Set appropriate locale code
     if (lang === 'mr') {
       utterance.lang = 'mr-IN';
-      utterance.rate = 0.92; // Slightly measured rate for clear Devanagari enunciation
+      utterance.rate = 0.92; // Measured rate for clear Devanagari enunciation
       utterance.pitch = 1.02;
     } else if (lang === 'hi') {
       utterance.lang = 'hi-IN';
@@ -177,13 +196,16 @@ export function speakVernacular(
       utterance.onend = () => callbacks.onEnd?.();
     }
     if (callbacks?.onError) {
-      utterance.onerror = (e) => callbacks.onError?.(e);
+      utterance.onerror = (e) => {
+        console.warn('Speech synthesis utterance error:', e);
+        callbacks.onError?.(e);
+      };
     }
 
     window.speechSynthesis.speak(utterance);
     triggerHaptic(20);
   } catch (err) {
-    console.error('Speech synthesis error:', err);
+    console.error('Speech synthesis execution error:', err);
     callbacks?.onError?.(err);
   }
 }
