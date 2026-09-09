@@ -31,142 +31,16 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   const [selectedScrapId, setSelectedScrapId] = useState<string>(SCRAP_ITEMS[0].id);
   const [transcript, setTranscript] = useState<string>('');
   const [speechMode, setSpeechMode] = useState<'stt' | 'tts'>('stt');
-  const [sttEngine, setSttEngine] = useState<'gemini' | 'browser'>('gemini');
   const [sttLang, setSttLang] = useState<'mr-IN' | 'hi-IN' | 'en-IN' | 'auto'>('auto');
   const [isListening, setIsListening] = React.useState<boolean>(false);
-  const [isRecordingAudio, setIsRecordingAudio] = useState<boolean>(false);
-  const [recordingSeconds, setRecordingSeconds] = useState<number>(0);
-  const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
-  const [isEnhancing, setIsEnhancing] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+
+  // Search & Category Filter States
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const recognitionRef = React.useRef<any>(null);
   const finalTranscriptRef = React.useRef<string>('');
-  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
-  const audioChunksRef = React.useRef<Blob[]>([]);
-  const recordingTimerRef = React.useRef<any>(null);
-
-  // Timer counter for audio recording
-  React.useEffect(() => {
-    if (isRecordingAudio) {
-      setRecordingSeconds(0);
-      recordingTimerRef.current = setInterval(() => {
-        setRecordingSeconds((prev) => prev + 1);
-      }, 1000);
-    } else {
-      if (recordingTimerRef.current) {
-        clearInterval(recordingTimerRef.current);
-      }
-    }
-    return () => {
-      if (recordingTimerRef.current) {
-        clearInterval(recordingTimerRef.current);
-      }
-    };
-  }, [isRecordingAudio]);
-
-  // High-precision Gemini AI Voice Recorder
-  const handleToggleGeminiRecording = async () => {
-    triggerHaptic(20);
-
-    if (isRecordingAudio) {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-        mediaRecorderRef.current.stop();
-      }
-      setIsRecordingAudio(false);
-      return;
-    }
-
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert(
-          language === 'en'
-            ? 'Microphone access is not supported on this browser.'
-            : 'आपके ब्राउज़र में माइक्रोफ़ोन सपोर्ट उपलब्ध नहीं है।'
-        );
-        return;
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioChunksRef.current = [];
-
-      let mimeType = 'audio/webm';
-      if (typeof MediaRecorder !== 'undefined' && !MediaRecorder.isTypeSupported('audio/webm')) {
-        if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
-        else if (MediaRecorder.isTypeSupported('audio/ogg')) mimeType = 'audio/ogg';
-        else mimeType = '';
-      }
-
-      const mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach((track) => track.stop());
-
-        const finalMime = mediaRecorder.mimeType || 'audio/webm';
-        const audioBlob = new Blob(audioChunksRef.current, { type: finalMime });
-
-        if (audioBlob.size === 0) return;
-
-        const reader = new FileReader();
-        reader.readAsDataURL(audioBlob);
-        reader.onloadend = async () => {
-          const resultStr = reader.result as string;
-          const base64Data = resultStr.includes(',') ? resultStr.split(',')[1] : resultStr;
-
-          if (!base64Data) return;
-
-          setIsTranscribing(true);
-          try {
-            const res = await fetch('/api/transcribe', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                audioBase64: base64Data,
-                mimeType: finalMime,
-                language,
-              }),
-            });
-            const data = await res.json();
-            if (data.transcript) {
-              setTranscript((prev) => {
-                const cleaned = data.transcript.trim();
-                return prev ? `${prev} ${cleaned}` : cleaned;
-              });
-              speakVernacular(
-                language === 'mr'
-                  ? 'आवाज अचूकपणे मजकुरात बदलला आहे.'
-                  : language === 'hi'
-                  ? 'आवाज़ को सटीकता के साथ टाइप कर दिया गया है।'
-                  : 'Voice transcribed with high precision.',
-                language
-              );
-            }
-          } catch (err) {
-            console.error('Audio transcription error:', err);
-          } finally {
-            setIsTranscribing(false);
-          }
-        };
-      };
-
-      mediaRecorder.start(250);
-      setIsRecordingAudio(true);
-    } catch (err: any) {
-      console.error('Mic access error:', err);
-      alert(
-        language === 'en'
-          ? 'Microphone permission denied or unavailable.'
-          : 'माइक्रोफ़ोन अनुमति स्वीकृत नहीं हुई।'
-      );
-    }
-  };
 
   // Browser Speech Recognition with non-duplicating finalTranscript logic
   const handleToggleListen = () => {
@@ -183,8 +57,8 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     if (!SpeechRecognition) {
       alert(
         language === 'en'
-          ? 'Live browser speech recognition is not supported on this browser. Use Gemini AI Voice Recorder instead!'
-          : 'आपके ब्राउज़र में लाइव वॉयस टाइपिंग समर्थित नहीं है। कृपया Gemini AI आवाज़ रेकॉर्डर का उपयोग करें!'
+          ? 'Live speech recognition is not supported on this browser.'
+          : 'आपके ब्राउज़र में लाइव वॉयस टाइपिंग समर्थित नहीं है।'
       );
       return;
     }
@@ -236,36 +110,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     setIsListening(true);
   };
 
-  // AI Accuracy Refiner to clean up typos and voice errors
-  const handleEnhanceTranscript = async () => {
-    if (!transcript || !transcript.trim()) return;
-    triggerHaptic(20);
-    setIsEnhancing(true);
-    try {
-      const res = await fetch('/api/enhance-transcript', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: transcript, language }),
-      });
-      const data = await res.json();
-      if (data.enhancedText) {
-        setTranscript(data.enhancedText);
-        speakVernacular(
-          language === 'mr'
-            ? 'मजकूर अचूकता सुधारली आहे.'
-            : language === 'hi'
-            ? 'टेक्स्ट की सटीकता सुधार दी गई है।'
-            : 'Transcript accuracy enhanced by AI.',
-          language
-        );
-      }
-    } catch (err) {
-      console.error('Enhance transcript error:', err);
-    } finally {
-      setIsEnhancing(false);
-    }
-  };
-
   const handleSpeakText = () => {
     triggerHaptic(20);
     if (isSpeaking) {
@@ -299,10 +143,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     if (isListening && recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
-    }
-    if (isRecordingAudio && mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      setIsRecordingAudio(false);
     }
     if (isSpeaking) {
       stopSpeech();
@@ -339,9 +179,144 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     speakVernacular(kb.audioWelcomePrompt, language);
   };
 
+  const CATEGORY_CHIPS = [
+    { id: 'all', labelEn: 'All Items', labelHi: 'सभी माल', labelMr: 'सर्व माल', icon: 'apps' },
+    { id: 'boards', labelEn: 'Circuit Boards / IT', labelHi: 'मदरबोर्ड व IT', labelMr: 'सर्किट बोर्ड व IT', icon: 'developer_board' },
+    { id: 'metals', labelEn: 'Metals & Wires', labelHi: 'तांबा व धातु', labelMr: 'कॉपर व धातू', icon: 'cable' },
+    { id: 'batteries', labelEn: 'Batteries & Power', labelHi: 'बैटरी व पावर', labelMr: 'बॅटरी व पॉवर', icon: 'battery_charging_full' },
+    { id: 'appliances', labelEn: 'Motors & Appliances', labelHi: 'मोटर व उपकरण', labelMr: 'मोटर व उपकरणे', icon: 'hardware' },
+    { id: 'hazardous', labelEn: 'Hazardous ⚠️', labelHi: 'ख़तरनाक माल ⚠️', labelMr: 'धोकादायक ⚠️', icon: 'warning' },
+  ];
+
+  const getCategoryCount = (catId: string): number => {
+    if (catId === 'all') return SCRAP_ITEMS.length;
+    return SCRAP_ITEMS.filter((item) => {
+      if (catId === 'hazardous') return Boolean(item.isHazardous);
+      if (catId === 'boards') {
+        return (
+          item.id.includes('pcb') ||
+          item.id.includes('board') ||
+          item.categoryEn.toLowerCase().includes('board') ||
+          item.categoryHi.includes('मदरबोर्ड') ||
+          (item.categoryMr && item.categoryMr.includes('मदरबोर्ड'))
+        );
+      }
+      if (catId === 'metals') {
+        return (
+          item.id.includes('copper') ||
+          item.id.includes('brass') ||
+          item.id.includes('aluminum') ||
+          item.categoryEn.toLowerCase().includes('wire') ||
+          item.categoryEn.toLowerCase().includes('metal') ||
+          item.categoryHi.includes('धातु') ||
+          item.categoryHi.includes('तांबा') ||
+          item.categoryHi.includes('पीतल')
+        );
+      }
+      if (catId === 'batteries') {
+        return (
+          item.id.includes('battery') ||
+          item.categoryEn.toLowerCase().includes('battery') ||
+          item.categoryHi.includes('बैटरी') ||
+          (item.categoryMr && item.categoryMr.includes('बॅटरी'))
+        );
+      }
+      if (catId === 'appliances') {
+        return (
+          item.id.includes('compressor') ||
+          item.id.includes('motor') ||
+          item.categoryEn.toLowerCase().includes('motor') ||
+          item.categoryHi.includes('मोटर') ||
+          (item.categoryMr && item.categoryMr.includes('मोटर'))
+        );
+      }
+      return false;
+    }).length;
+  };
+
+  const filteredScrapItems = SCRAP_ITEMS.filter((item) => {
+    // Category filter check
+    if (selectedCategory === 'hazardous') {
+      if (!item.isHazardous) return false;
+    } else if (selectedCategory === 'boards') {
+      const isBoard =
+        item.id.includes('pcb') ||
+        item.id.includes('board') ||
+        item.categoryEn.toLowerCase().includes('board') ||
+        item.categoryHi.includes('मदरबोर्ड') ||
+        (item.categoryMr && item.categoryMr.includes('मदरबोर्ड'));
+      if (!isBoard) return false;
+    } else if (selectedCategory === 'metals') {
+      const isMetal =
+        item.id.includes('copper') ||
+        item.id.includes('brass') ||
+        item.id.includes('aluminum') ||
+        item.categoryEn.toLowerCase().includes('wire') ||
+        item.categoryEn.toLowerCase().includes('metal') ||
+        item.categoryHi.includes('धातु') ||
+        item.categoryHi.includes('तांबा') ||
+        item.categoryHi.includes('पीतल');
+      if (!isMetal) return false;
+    } else if (selectedCategory === 'batteries') {
+      const isBattery =
+        item.id.includes('battery') ||
+        item.categoryEn.toLowerCase().includes('battery') ||
+        item.categoryHi.includes('बैटरी') ||
+        (item.categoryMr && item.categoryMr.includes('बॅटरी'));
+      if (!isBattery) return false;
+    } else if (selectedCategory === 'appliances') {
+      const isAppliance =
+        item.id.includes('compressor') ||
+        item.id.includes('motor') ||
+        item.categoryEn.toLowerCase().includes('motor') ||
+        item.categoryHi.includes('मोटर') ||
+        (item.categoryMr && item.categoryMr.includes('मोटर'));
+      if (!isAppliance) return false;
+    }
+
+    // Search query check
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const nameEn = (item.nameEn || '').toLowerCase();
+    const nameHi = (item.nameHi || '').toLowerCase();
+    const nameMr = (item.nameMr || '').toLowerCase();
+    const catEn = (item.categoryEn || '').toLowerCase();
+    const catHi = (item.categoryHi || '').toLowerCase();
+    const catMr = (item.categoryMr || '').toLowerCase();
+    const grade = (item.grade || '').toLowerCase();
+
+    return (
+      nameEn.includes(q) ||
+      nameHi.includes(q) ||
+      nameMr.includes(q) ||
+      catEn.includes(q) ||
+      catHi.includes(q) ||
+      catMr.includes(q) ||
+      grade.includes(q)
+    );
+  });
+
   const handleHearAllRates = () => {
     triggerHaptic(30);
-    speakVernacular(kb.audioRatesSpeech, language);
+    if (filteredScrapItems.length === 0) {
+      speakVernacular(
+        language === 'mr'
+          ? 'कोणतेही आयटम सापडले नाहीत.'
+          : language === 'en'
+          ? 'No items found in search.'
+          : 'कोई आइटम नहीं मिला।',
+        language
+      );
+      return;
+    }
+    const itemSummaries = filteredScrapItems
+      .slice(0, 4)
+      .map(
+        (it) =>
+          `${getItemName(it)} ₹${it.baseRate} ${language === 'en' ? 'rupees per kg' : 'रुपये प्रति किलो'}`
+      )
+      .join('. ');
+    speakVernacular(itemSummaries, language);
   };
 
   const getItemName = (item: ScrapItem) => {
@@ -594,86 +569,231 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           </button>
         </div>
 
+        {/* Search Bar & Category Filter Chips */}
+        <div className="flex flex-col gap-2.5 w-full bg-white p-3 rounded-xl border-2 border-[#191c1e] shadow-[0_3px_0px_#191c1e]">
+          {/* Search Bar Input */}
+          <div className="relative w-full flex items-center">
+            <span className="material-symbols-outlined absolute left-3 text-[#565e74] text-[20px] pointer-events-none">
+              search
+            </span>
+            <input
+              id="scrap-search-input"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={
+                language === 'en'
+                  ? 'Search scrap items (e.g. Copper, PCB, Battery...)'
+                  : language === 'mr'
+                  ? 'कचरा किंवा धातू शोधा (उदा. तांबे, PCB, बॅटरी...)'
+                  : 'स्क्रैप आइटम खोजें (जैसे तांबा, मदरबोर्ड, बैटरी...)'
+              }
+              className="w-full bg-[#f2f4f6] border border-[#bccac0]/60 rounded-xl py-2 pl-9 pr-8 text-[13px] font-bold text-[#191c1e] outline-none focus:border-[#006948] transition-colors placeholder:text-[#8e9099] placeholder:font-medium"
+            />
+            {searchQuery && (
+              <button
+                id="scrap-search-clear-btn"
+                type="button"
+                onClick={() => {
+                  triggerHaptic(10);
+                  setSearchQuery('');
+                }}
+                className="absolute right-2.5 p-1 text-[#8e9099] hover:text-[#191c1e] active:scale-90 cursor-pointer"
+                aria-label="Clear search input"
+              >
+                <span className="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            )}
+          </div>
+
+          {/* Category Filter Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 pt-0.5 scrollbar-none">
+            {CATEGORY_CHIPS.map((chip) => {
+              const label =
+                language === 'mr'
+                  ? chip.labelMr
+                  : language === 'en'
+                  ? chip.labelEn
+                  : chip.labelHi;
+              const isActive = selectedCategory === chip.id;
+              const count = getCategoryCount(chip.id);
+
+              return (
+                <button
+                  key={chip.id}
+                  id={`chip-category-${chip.id}`}
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic(15);
+                    setSelectedCategory(chip.id);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl font-bold text-[11px] whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer border select-none ${
+                    isActive
+                      ? 'bg-[#006948] text-white border-[#002114] shadow-[0_2px_0px_#002114]'
+                      : 'bg-[#f2f4f6] text-[#191c1e] border-[#bccac0]/60 hover:bg-[#e6e8ea]'
+                  }`}
+                >
+                  <span
+                    className={`material-symbols-outlined text-[15px] ${
+                      isActive ? 'text-[#85f8c4]' : 'text-[#565e74]'
+                    }`}
+                  >
+                    {chip.icon}
+                  </span>
+                  <span>{label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-extrabold leading-none ${
+                      isActive
+                        ? 'bg-[#85f8c4] text-[#002114]'
+                        : 'bg-[#e6e8ea] text-[#565e74]'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Results Summary Bar */}
+          <div className="flex items-center justify-between text-[11px] text-[#565e74] pt-1 border-t border-[#e6e8ea]">
+            <span className="font-semibold">
+              {language === 'en'
+                ? `Showing ${filteredScrapItems.length} of ${SCRAP_ITEMS.length} items`
+                : language === 'mr'
+                ? `${SCRAP_ITEMS.length} पैकी ${filteredScrapItems.length} आयटम सापडले`
+                : `${SCRAP_ITEMS.length} में से ${filteredScrapItems.length} आइटम मिले`}
+            </span>
+            {(searchQuery || selectedCategory !== 'all') && (
+              <button
+                id="scrap-filter-reset-btn"
+                type="button"
+                onClick={() => {
+                  triggerHaptic(10);
+                  setSearchQuery('');
+                  setSelectedCategory('all');
+                }}
+                className="text-[#006948] font-extrabold hover:underline flex items-center gap-0.5 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[13px]">refresh</span>
+                <span>{language === 'en' ? 'Reset' : language === 'mr' ? 'रीसेट' : 'रीसेट करें'}</span>
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Rates Stacking List */}
         <div className="flex flex-col gap-2.5 w-full">
-          {SCRAP_ITEMS.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => {
-                triggerHaptic(25);
-                onSelectItemForWeighing(item, calcWeight);
-              }}
-              className="w-full bg-white rounded-xl p-3 shadow-[0_3px_0px_#191c1e] border-2 border-[#191c1e] flex items-center justify-between active:scale-[0.99] transition-all cursor-pointer hover:border-[#006948]"
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-14 h-14 rounded-xl bg-[#e6e8ea] flex items-center justify-center overflow-hidden relative shrink-0 border border-[#bccac0]/40">
-                  <img
-                    src={item.imageUrl}
-                    alt={getItemName(item)}
-                    className="w-full h-full object-cover"
-                  />
-                  {item.isHazardous && (
-                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#ba1a1a] flex items-center justify-center text-white text-[10px]">
-                      !
+          {filteredScrapItems.length === 0 ? (
+            <div className="w-full bg-white rounded-xl p-6 border-2 border-dashed border-[#bccac0] flex flex-col items-center justify-center text-center gap-2">
+              <span className="material-symbols-outlined text-[36px] text-[#8e9099]">search_off</span>
+              <span className="text-[14px] font-bold text-[#191c1e]">
+                {language === 'en'
+                  ? 'No scrap items match your query'
+                  : language === 'mr'
+                  ? 'कोणताही ई-कचरा किंवा धातू आढळला नाही'
+                  : 'आपकी खोज के अनुसार कोई आइटम नहीं मिला'}
+              </span>
+              <p className="text-[11px] text-[#565e74] max-w-[240px]">
+                {language === 'en'
+                  ? 'Try searching with a different keyword or select "All Items".'
+                  : language === 'mr'
+                  ? 'कृपया वेगळा शब्द शोधा किंवा "सर्व माल" निवडा.'
+                  : 'कृपया कोई अन्य शब्द खोजें या "सभी माल" चुनें।'}
+              </p>
+              <button
+                id="scrap-empty-reset-btn"
+                type="button"
+                onClick={() => {
+                  triggerHaptic(15);
+                  setSearchQuery('');
+                  setSelectedCategory('all');
+                }}
+                className="mt-1 px-4 py-1.5 bg-[#006948] text-white rounded-lg text-[12px] font-bold shadow-sm active:scale-95 cursor-pointer"
+              >
+                {language === 'en' ? 'Show All Items' : language === 'mr' ? 'सर्व माल पहा' : 'सभी माल देखें'}
+              </button>
+            </div>
+          ) : (
+            filteredScrapItems.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => {
+                  triggerHaptic(25);
+                  onSelectItemForWeighing(item, calcWeight);
+                }}
+                className="w-full bg-white rounded-xl p-3 shadow-[0_3px_0px_#191c1e] border-2 border-[#191c1e] flex items-center justify-between active:scale-[0.99] transition-all cursor-pointer hover:border-[#006948]"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-14 h-14 rounded-xl bg-[#e6e8ea] flex items-center justify-center overflow-hidden relative shrink-0 border border-[#bccac0]/40">
+                    <img
+                      src={item.imageUrl}
+                      alt={getItemName(item)}
+                      className="w-full h-full object-cover"
+                    />
+                    {item.isHazardous && (
+                      <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#ba1a1a] flex items-center justify-center text-white text-[10px]">
+                        !
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[15px] font-bold text-[#191c1e] truncate">
+                        {getItemName(item)}
+                      </span>
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${
+                          item.isHazardous ? 'bg-[#b15f00]' : 'bg-[#006948]'
+                        }`}
+                      />
+                    </div>
+                    <span className="text-[11px] text-[#565e74] truncate">
+                      {getItemCategory(item)}
                     </span>
-                  )}
+                    <span className="text-[10px] text-[#006948] font-bold">{kb.tapToWeigh}</span>
+                  </div>
                 </div>
 
-                <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[15px] font-bold text-[#191c1e] truncate">
-                      {getItemName(item)}
+                <div className="flex flex-col items-end shrink-0 pl-2">
+                  <div
+                    className={`flex items-baseline gap-0.5 px-2 py-0.5 rounded-lg ${
+                      item.isHazardous
+                        ? 'bg-[#ffdcc3] text-[#2f1500]'
+                        : 'bg-[#85f8c4]/40 text-[#002114]'
+                    }`}
+                  >
+                    <span
+                      className={`text-[22px] font-bold font-['Space_Grotesk'] leading-tight ${
+                        item.isHazardous ? 'text-[#8d4b00]' : 'text-[#006948]'
+                      }`}
+                    >
+                      ₹{item.baseRate}
                     </span>
                     <span
-                      className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${
-                        item.isHazardous ? 'bg-[#b15f00]' : 'bg-[#006948]'
+                      className={`text-[11px] font-bold ${
+                        item.isHazardous ? 'text-[#8d4b00]' : 'text-[#006948]'
                       }`}
-                    />
+                    >
+                      /KG
+                    </span>
                   </div>
-                  <span className="text-[11px] text-[#565e74] truncate">
-                    {getItemCategory(item)}
-                  </span>
-                  <span className="text-[10px] text-[#006948] font-bold">{kb.tapToWeigh}</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col items-end shrink-0 pl-2">
-                <div
-                  className={`flex items-baseline gap-0.5 px-2 py-0.5 rounded-lg ${
-                    item.isHazardous
-                      ? 'bg-[#ffdcc3] text-[#2f1500]'
-                      : 'bg-[#85f8c4]/40 text-[#002114]'
-                  }`}
-                >
                   <span
-                    className={`text-[22px] font-bold font-['Space_Grotesk'] leading-tight ${
-                      item.isHazardous ? 'text-[#8d4b00]' : 'text-[#006948]'
+                    className={`text-[11px] font-bold mt-0.5 ${
+                      item.rateTrend === 'up'
+                        ? 'text-[#006948]'
+                        : item.rateTrend === 'down'
+                        ? 'text-[#ba1a1a]'
+                        : 'text-[#565e74]'
                     }`}
                   >
-                    ₹{item.baseRate}
-                  </span>
-                  <span
-                    className={`text-[11px] font-bold ${
-                      item.isHazardous ? 'text-[#8d4b00]' : 'text-[#006948]'
-                    }`}
-                  >
-                    /KG
+                    {item.rateChange}
                   </span>
                 </div>
-                <span
-                  className={`text-[11px] font-bold mt-0.5 ${
-                    item.rateTrend === 'up'
-                      ? 'text-[#006948]'
-                      : item.rateTrend === 'down'
-                      ? 'text-[#ba1a1a]'
-                      : 'text-[#565e74]'
-                  }`}
-                >
-                  {item.rateChange}
-                </span>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </section>
 
@@ -839,10 +959,10 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               <span className="text-[16px] font-black text-[#191c1e]">
                 {speechMode === 'stt'
                   ? language === 'en'
-                    ? 'AI Speech to Text (Voice Typing)'
+                    ? 'Voice Typing (Speech to Text)'
                     : language === 'mr'
-                    ? 'स्मार्ट आवाज टाईपिंग (AI Transcriber)'
-                    : 'स्मार्ट आवाज़ टाइपिंग (AI Transcriber)'
+                    ? 'आवाज टाईपिंग (मजकूर लिहा)'
+                    : 'आवाज़ टाइपिंग (टेक्स्ट लिखें)'
                   : language === 'en'
                   ? 'Text to Speech (TTS)'
                   : language === 'mr'
@@ -852,27 +972,10 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
 
             {/* Live active badges */}
-            {speechMode === 'stt' && isRecordingAudio && (
-              <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ba1a1a] text-white text-[11px] font-bold uppercase animate-pulse shadow-sm">
+            {speechMode === 'stt' && isListening && (
+              <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#003b8e] text-white text-[11px] font-bold uppercase animate-pulse shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
-                <span>
-                  {language === 'en' ? 'Recording' : language === 'mr' ? 'रेकॉर्डिंग...' : 'रेकॉर्डिंग...'}{' '}
-                  00:{recordingSeconds < 10 ? `0${recordingSeconds}` : recordingSeconds}
-                </span>
-              </span>
-            )}
-
-            {speechMode === 'stt' && isTranscribing && (
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#006948] text-white text-[11px] font-bold shadow-sm">
-                <span className="material-symbols-outlined text-[14px] animate-spin">sync</span>
-                <span>{language === 'en' ? 'AI Transcribing...' : language === 'mr' ? 'AI ट्रान्सक्राइब...' : 'AI टाइपिंग...'}</span>
-              </span>
-            )}
-
-            {speechMode === 'stt' && isListening && !isRecordingAudio && (
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#003b8e]/10 text-[#003b8e] text-[10px] font-bold uppercase animate-pulse border border-[#003b8e]/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#003b8e]"></span>
-                {language === 'en' ? 'Listening...' : language === 'mr' ? 'ऐकत आहे...' : 'सुन रहा है...'}
+                <span>{language === 'en' ? 'Listening...' : language === 'mr' ? 'ऐकत आहे...' : 'सुन रहा है...'}</span>
               </span>
             )}
 
@@ -913,92 +1016,46 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           </div>
         </div>
 
-        {/* STT Engine & Language Sub-bar */}
+        {/* Dialect / Language Sub-bar */}
         {speechMode === 'stt' && (
-          <div className="flex flex-col gap-1.5 p-2 rounded-lg bg-white/80 border border-[#003b8e]/20 text-[11px]">
-            <div className="flex items-center justify-between gap-1">
-              <span className="font-bold text-[#003b8e]">
-                {language === 'en' ? 'Voice Engine:' : language === 'mr' ? 'आवाज इंजिन:' : 'आवाज़ इंजन:'}
-              </span>
-              <div className="flex items-center gap-1">
+          <div className="flex items-center justify-between gap-1 p-2 rounded-lg bg-white/80 border border-[#003b8e]/20 text-[11px]">
+            <span className="font-bold text-[#003b8e]">
+              {language === 'en' ? 'Language:' : language === 'mr' ? 'भाषा निवडा:' : 'भाषा चुनें:'}
+            </span>
+            <div className="flex items-center gap-1 overflow-x-auto">
+              {[
+                { id: 'auto', label: 'Auto' },
+                { id: 'hi-IN', label: 'हिंदी' },
+                { id: 'mr-IN', label: 'मराठी' },
+                { id: 'en-IN', label: 'English' },
+              ].map((item) => (
                 <button
+                  key={item.id}
                   type="button"
-                  onClick={() => {
-                    triggerHaptic(10);
-                    setSttEngine('gemini');
-                  }}
-                  className={`px-2 py-0.5 rounded-md font-bold transition-all border ${
-                    sttEngine === 'gemini'
-                      ? 'bg-[#006948] text-white border-[#006948]'
-                      : 'bg-white text-[#565e74] border-[#bccac0]'
-                  }`}
-                >
-                  ⚡ Gemini AI Audio (100% Exact)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic(10);
-                    setSttEngine('browser');
-                  }}
-                  className={`px-2 py-0.5 rounded-md font-bold transition-all border ${
-                    sttEngine === 'browser'
+                  onClick={() => setSttLang(item.id as any)}
+                  className={`px-2 py-0.5 rounded-md font-bold text-[10px] transition-all border cursor-pointer ${
+                    sttLang === item.id
                       ? 'bg-[#003b8e] text-white border-[#003b8e]'
-                      : 'bg-white text-[#565e74] border-[#bccac0]'
+                      : 'bg-white text-[#191c1e] border-[#bccac0]'
                   }`}
                 >
-                  🎙️ Live Browser Speech
+                  {item.label}
                 </button>
-              </div>
+              ))}
             </div>
-
-            {sttEngine === 'browser' && (
-              <div className="flex items-center justify-between gap-1 pt-1 border-t border-[#003b8e]/10">
-                <span className="font-bold text-[#003b8e]">
-                  {language === 'en' ? 'Dialect:' : language === 'mr' ? 'भाषा निवडा:' : 'भाषा चुनें:'}
-                </span>
-                <div className="flex items-center gap-1 overflow-x-auto">
-                  {[
-                    { id: 'auto', label: 'Auto' },
-                    { id: 'hi-IN', label: 'हिंदी' },
-                    { id: 'mr-IN', label: 'मराठी' },
-                    { id: 'en-IN', label: 'English' },
-                  ].map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setSttLang(item.id as any)}
-                      className={`px-2 py-0.5 rounded-md font-bold text-[10px] transition-all border ${
-                        sttLang === item.id
-                          ? 'bg-[#003b8e] text-white border-[#003b8e]'
-                          : 'bg-white text-[#191c1e] border-[#bccac0]'
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
 
         {/* Guidance Prompt */}
         <p className="text-[12px] text-[#003b8e] font-medium leading-tight">
           {speechMode === 'stt'
-            ? sttEngine === 'gemini'
-              ? language === 'en'
-                ? 'Tap "Record Voice" and speak clearly. Gemini AI will transcribe your voice into exact text.'
-                : language === 'mr'
-                ? '"रेकॉर्ड करा" दाबा आणि स्पष्ट बोला. जेमिनी AI तुमचे बोलणे अचूक मजकुरात बदलेल.'
-                : '"रेकॉर्ड करें" दबाएं और स्पष्ट बोलें। Gemini AI आपकी आवाज़ को सटीक टेक्स्ट में बदलेगा।'
-              : language === 'en'
-              ? 'Tap microphone to start continuous speech typing with real-time word assembly.'
+            ? language === 'en'
+              ? 'Tap microphone to start live voice typing in English, Hindi, or Marathi.'
               : language === 'mr'
-              ? 'थेट मायक्रोफोन द्वारे सलग आवाज टाईपिंग सुरू करण्यासाठी दाबा.'
-              : 'लाइव आवाज़ से टाइप करने के लिए माइक्रोफ़ोन बटन दबाएं।'
+              ? 'मराठी, हिंदी किंवा इंग्रजीत थेट बोलून टाईप करण्यासाठी मायक्रोफोन दाबा.'
+              : 'मराठी, हिंदी या अंग्रेज़ी में बोलकर टाइप करने के लिए माइक्रोफ़ोन बटन दबाएं।'
             : language === 'en'
-            ? 'Type or paste text below and tap "Read Aloud" to hear clear vernacular voice playback.'
+            ? 'Type or paste text below and tap "Read Aloud" to hear clear voice playback.'
             : language === 'mr'
             ? 'खाली मजकूर लिहा किंवा पेस्ट करा आणि आवाज ऐकण्यासाठी "वाचून दाखवा" दाबा.'
             : 'नीचे टेक्स्ट लिखें या पेस्ट करें और आवाज़ में सुनने के लिए "बोलकर सुनाएं" दबाएं।'}
@@ -1022,7 +1079,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                     : 'Live Scrap Rates: PCB Motherboard ₹280 per kg, Copper Wire ₹540 per kg.'
                 );
               }}
-              className="px-2.5 py-1 rounded-full bg-white text-[#003b8e] border border-[#003b8e]/30 shrink-0 hover:bg-[#003b8e]/10 active:scale-95 font-semibold"
+              className="px-2.5 py-1 rounded-full bg-white text-[#003b8e] border border-[#003b8e]/30 shrink-0 hover:bg-[#003b8e]/10 active:scale-95 font-semibold cursor-pointer"
             >
               {language === 'en' ? 'Mandi Rates' : language === 'mr' ? 'बाजार भाव' : 'मंडी भाव'}
             </button>
@@ -1038,7 +1095,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                     : 'Safety Notice: Always wear protective safety gloves when handling e-waste.'
                 );
               }}
-              className="px-2.5 py-1 rounded-full bg-white text-[#003b8e] border border-[#003b8e]/30 shrink-0 hover:bg-[#003b8e]/10 active:scale-95 font-semibold"
+              className="px-2.5 py-1 rounded-full bg-white text-[#003b8e] border border-[#003b8e]/30 shrink-0 hover:bg-[#003b8e]/10 active:scale-95 font-semibold cursor-pointer"
             >
               {language === 'en' ? 'Safety Notice' : language === 'mr' ? 'सुरक्षितता' : 'सुरक्षा निर्देश'}
             </button>
@@ -1054,7 +1111,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                     : 'Welcome to Kabadiwala Connect. Sell certified e-waste directly at verified rates.'
                 );
               }}
-              className="px-2.5 py-1 rounded-full bg-white text-[#003b8e] border border-[#003b8e]/30 shrink-0 hover:bg-[#003b8e]/10 active:scale-95 font-semibold"
+              className="px-2.5 py-1 rounded-full bg-white text-[#003b8e] border border-[#003b8e]/30 shrink-0 hover:bg-[#003b8e]/10 active:scale-95 font-semibold cursor-pointer"
             >
               {language === 'en' ? 'Welcome' : language === 'mr' ? 'स्वागत' : 'स्वागत'}
             </button>
@@ -1067,17 +1124,11 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             onChange={(e) => setTranscript(e.target.value)}
             placeholder={
               speechMode === 'stt'
-                ? isTranscribing
-                  ? language === 'en'
-                    ? 'Gemini AI is transcribing your recorded voice...'
-                    : language === 'mr'
-                    ? 'जेमिनी AI तुमचा आवाज अचूक मजकुरात बदलत आहे...'
-                    : 'Gemini AI आपकी आवाज़ को सटीक टेक्स्ट में बदल रहा है...'
-                  : language === 'en'
-                  ? 'Your exact voice transcript will appear here...'
+                ? language === 'en'
+                  ? 'Your voice transcript will appear here...'
                   : language === 'mr'
-                  ? 'तुमचे अचूक बोलणे येथे टाईप दिसेल...'
-                  : 'आपकी आवाज़ का सटीक टेक्स्ट यहाँ टाइप होगा...'
+                  ? 'तुमचे बोलणे येथे टाईप दिसेल...'
+                  : 'आपकी आवाज़ का टेक्स्ट यहाँ टाइप होगा...'
                 : language === 'en'
                 ? 'Enter text to convert into speech...'
                 : language === 'mr'
@@ -1086,98 +1137,35 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             }
             className="w-full bg-white border border-[#003b8e]/30 rounded-lg p-3 text-[14px] font-medium text-[#191c1e] outline-none focus:border-[#003b8e] min-h-[95px] resize-none shadow-inner pr-10"
           />
-
-          {/* AI Accuracy Enhancer Floating Tooltip */}
-          {transcript.trim().length > 3 && (
-            <button
-              type="button"
-              onClick={handleEnhanceTranscript}
-              disabled={isEnhancing}
-              title={
-                language === 'en'
-                  ? 'AI Fix & Enhance Transcript Accuracy'
-                  : language === 'mr'
-                  ? 'मजकूर अचूकता सुधारा'
-                  : 'AI से सटीकता सुधारें'
-              }
-              className="absolute top-2.5 right-2.5 p-1.5 rounded-md bg-[#006948] text-white hover:bg-[#005137] active:scale-95 shadow-sm transition-all flex items-center justify-center cursor-pointer"
-            >
-              <span
-                className={`material-symbols-outlined text-[18px] ${
-                  isEnhancing ? 'animate-spin' : ''
-                }`}
-              >
-                auto_fix_high
-              </span>
-            </button>
-          )}
         </div>
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
           {speechMode === 'stt' ? (
-            sttEngine === 'gemini' ? (
-              <button
-                type="button"
-                onClick={handleToggleGeminiRecording}
-                disabled={isTranscribing}
-                className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all cursor-pointer ${
-                  isRecordingAudio
-                    ? 'bg-[#ba1a1a] animate-pulse'
-                    : isTranscribing
-                    ? 'bg-[#006948]/80'
-                    : 'bg-[#006948]'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  {isRecordingAudio ? 'stop' : isTranscribing ? 'sync' : 'mic'}
-                </span>
-                <span>
-                  {isRecordingAudio
-                    ? language === 'en'
-                      ? 'Stop & Transcribe'
-                      : language === 'mr'
-                      ? 'रेकॉर्डिंग थांबवा'
-                      : 'रेकॉर्डिंग रोकें'
-                    : isTranscribing
-                    ? language === 'en'
-                      ? 'AI Transcribing...'
-                      : language === 'mr'
-                      ? 'AI काम करत आहे...'
-                      : 'AI टाइपिंग...'
-                    : language === 'en'
-                    ? 'Record Voice (Gemini AI)'
+            <button
+              type="button"
+              onClick={handleToggleListen}
+              className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all cursor-pointer ${
+                isListening ? 'bg-[#ba1a1a]' : 'bg-[#003b8e]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                {isListening ? 'mic_off' : 'mic'}
+              </span>
+              <span>
+                {isListening
+                  ? language === 'en'
+                    ? 'Stop Listening'
                     : language === 'mr'
-                    ? 'आवाज रेकॉर्ड करा (AI)'
-                    : 'आवाज़ रेकॉर्ड करें (AI)'}
-                </span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleToggleListen}
-                className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all cursor-pointer ${
-                  isListening ? 'bg-[#ba1a1a]' : 'bg-[#003b8e]'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  {isListening ? 'mic_off' : 'mic'}
-                </span>
-                <span>
-                  {isListening
-                    ? language === 'en'
-                      ? 'Stop Listening'
-                      : language === 'mr'
-                      ? 'थांबवा'
-                      : 'रोकें'
-                    : language === 'en'
-                    ? 'Start Live Voice Typing'
-                    : language === 'mr'
-                    ? 'लाईव्ह टाईपिंग सुरू करा'
-                    : 'लाइव टाइपिंग शुरू करें'}
-                </span>
-              </button>
-            )
+                    ? 'थांबवा'
+                    : 'रोकें'
+                  : language === 'en'
+                  ? 'Start Voice Typing'
+                  : language === 'mr'
+                  ? 'आवाज टाईपिंग सुरू करा'
+                  : 'आवाज़ टाइपिंग शुरू करें'}
+              </span>
+            </button>
           ) : (
             <button
               type="button"
@@ -1201,30 +1189,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                   : language === 'mr'
                   ? 'वाचून दाखवा (मजकूर ऐका)'
                   : 'बोलकर सुनाएं (ऑडियो)'}
-              </span>
-            </button>
-          )}
-
-          {speechMode === 'stt' && (
-            <button
-              type="button"
-              onClick={handleEnhanceTranscript}
-              disabled={isEnhancing || !transcript.trim()}
-              className="h-11 px-3 bg-white border border-[#003b8e]/30 rounded-xl flex items-center justify-center text-[#006948] active:scale-95 shadow-sm transition-transform hover:bg-[#006948]/10 cursor-pointer disabled:opacity-50"
-              title={
-                language === 'en'
-                  ? 'AI Refine Accuracy'
-                  : language === 'mr'
-                  ? 'अचूकता सुधारा'
-                  : 'सटीकता सुधारें'
-              }
-            >
-              <span
-                className={`material-symbols-outlined text-[20px] ${
-                  isEnhancing ? 'animate-spin' : ''
-                }`}
-              >
-                auto_fix_high
               </span>
             </button>
           )}
