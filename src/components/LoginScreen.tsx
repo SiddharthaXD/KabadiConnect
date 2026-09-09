@@ -6,24 +6,10 @@ import { speakVernacular, triggerHaptic } from '../utils/speech';
 interface LoginScreenProps {
   onLogin: (role: UserRole, profile: UserProfile) => void;
   language: Language;
-  onLanguageChange?: (lang: Language) => void;
   currentRole?: UserRole;
   onCancel?: () => void;
   isModal?: boolean;
 }
-
-interface LanguageItem {
-  id: Language;
-  flag: string;
-  nativeName: string;
-  englishLabel: string;
-}
-
-const LANGUAGE_OPTIONS: LanguageItem[] = [
-  { id: 'hi', flag: '🇮🇳', nativeName: 'हिन्दी', englishLabel: 'Hindi' },
-  { id: 'en', flag: '🌐', nativeName: 'English', englishLabel: 'English' },
-  { id: 'mr', flag: '🚩', nativeName: 'मराठी', englishLabel: 'Marathi' },
-];
 
 interface LoginLocaleContent {
   langSelectLabel: string;
@@ -204,7 +190,6 @@ const LOGIN_LOCALES: Record<Language, LoginLocaleContent> = {
 export const LoginScreen: React.FC<LoginScreenProps> = ({
   onLogin,
   language,
-  onLanguageChange,
   currentRole,
   onCancel,
   isModal = false,
@@ -216,13 +201,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   const [otpValue, setOtpValue] = useState<string>('4829');
 
   const t = LOGIN_LOCALES[language] || LOGIN_LOCALES.hi;
-
-  const handleLanguageSelect = (lang: Language) => {
-    triggerHaptic(20);
-    onLanguageChange?.(lang);
-    const welcome = LOGIN_LOCALES[lang].audioLangSwitched;
-    speakVernacular(welcome, lang);
-  };
 
   const handleRoleSelect = (role: UserRole) => {
     triggerHaptic(25);
@@ -279,58 +257,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
       className={
         isModal
           ? 'flex flex-col w-full gap-4'
-          : 'flex flex-col w-full max-w-md mx-auto px-4 pt-20 pb-28 gap-4'
+          : 'flex flex-col w-full max-w-md mx-auto px-4 pt-32 pb-28 gap-4'
       }
     >
-      {/* 3-Language Selector Interface Card */}
-      <div
-        id="login-language-selector"
-        className="w-full bg-white rounded-2xl p-3 shadow-sm border-2 border-[#191c1e] flex flex-col gap-2"
-      >
-        <div className="flex items-center justify-between px-0.5">
-          <div className="flex items-center gap-1.5 text-[#191c1e]">
-            <span className="material-symbols-outlined text-[18px] text-[#006948]">translate</span>
-            <span className="text-[13px] font-black tracking-tight">{t.langSelectLabel}</span>
-          </div>
-          <span className="text-[11px] font-bold text-[#006948] bg-[#85f8c4]/40 px-2 py-0.5 rounded-full">
-            {language === 'hi' ? '3 भाषाएं' : language === 'mr' ? '३ भाषा' : '3 Languages'}
-          </span>
-        </div>
-
-        {/* Language Selection Buttons */}
-        <div className="grid grid-cols-3 gap-2">
-          {LANGUAGE_OPTIONS.map((lang) => {
-            const isActive = language === lang.id;
-            return (
-              <button
-                key={lang.id}
-                type="button"
-                id={`btn-login-lang-${lang.id}`}
-                onClick={() => handleLanguageSelect(lang.id)}
-                className={`py-2.5 px-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 border-2 ${
-                  isActive
-                    ? 'bg-[#006948] text-white border-[#002114] shadow-md ring-2 ring-[#006948]/25'
-                    : 'bg-[#f2f4f6] text-[#191c1e] border-transparent hover:bg-[#e6e8ea]'
-                }`}
-                aria-pressed={isActive}
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[15px]">{lang.flag}</span>
-                  <span className="text-[14px] font-black leading-none">{lang.nativeName}</span>
-                </div>
-                <span
-                  className={`text-[10px] font-bold leading-none ${
-                    isActive ? 'text-[#85f8c4]' : 'text-[#565e74]'
-                  }`}
-                >
-                  {lang.englishLabel}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* App Branding Top Header */}
       <div className={`text-center flex flex-col items-center ${isModal ? 'pt-1' : ''}`}>
         {!isModal && (

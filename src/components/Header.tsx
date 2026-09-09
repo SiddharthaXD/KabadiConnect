@@ -118,11 +118,11 @@ export const Header: React.FC<HeaderProps> = ({
   const isRootScreen = isHome || currentScreen === 'login' || currentScreen === 'recycler_dashboard';
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 bg-[#f7f9fb]/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#bccac0]/30 pt-safe">
+    <header className="fixed top-0 inset-x-0 z-50 bg-[#f7f9fb]/95 dark:bg-[#0b131a]/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#bccac0]/30 dark:border-[#1e293b] pt-safe transition-colors">
       <div className="max-w-md mx-auto px-4 py-2 flex flex-col justify-center gap-1.5">
-        {/* Row 1: Logo / Back + Title + Voice + Profile */}
-        <div className="flex items-center justify-between min-h-[44px]">
-          <div className="flex items-center gap-2">
+        {/* Row 1: Logo / Back + Title + Voice + Dark Mode + Profile */}
+        <div className="flex items-center justify-between min-h-[42px]">
+          <div className="flex items-center gap-2 min-w-0">
             {!isRootScreen ? (
               <button
                 id="btn-back"
@@ -131,20 +131,20 @@ export const Header: React.FC<HeaderProps> = ({
                   triggerHaptic(20);
                   onNavigate(userProfile?.role === 'recycler' ? 'recycler_dashboard' : 'home');
                 }}
-                className="w-10 h-10 rounded-xl bg-[#eceef0] flex items-center justify-center text-[#191c1e] hover:bg-[#e6e8ea] active:scale-95 transition-all shadow-sm"
+                className="w-9 h-9 rounded-xl bg-[#eceef0] dark:bg-[#1e293b] flex items-center justify-center text-[#191c1e] dark:text-[#f1f5f9] hover:bg-[#e6e8ea] dark:hover:bg-[#283848] active:scale-95 transition-all shadow-sm shrink-0 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[24px]">arrow_back</span>
+                <span className="material-symbols-outlined text-[22px]">arrow_back</span>
               </button>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-[#006948] flex items-center justify-center text-white shadow-sm shrink-0">
-                <span className="material-symbols-outlined text-[24px]">
+              <div className="w-9 h-9 rounded-xl bg-[#006948] flex items-center justify-center text-white shadow-sm shrink-0">
+                <span className="material-symbols-outlined text-[22px]">
                   {currentScreen === 'recycler_dashboard' ? 'factory' : 'recycling'}
                 </span>
               </div>
             )}
 
-            <div className="flex flex-col">
-              <span className="text-[17px] font-bold text-[#191c1e] tracking-tight leading-tight">
+            <div className="flex flex-col min-w-0">
+              <span className="text-[16px] font-extrabold text-[#191c1e] dark:text-[#f1f5f9] tracking-tight leading-tight truncate">
                 {title ||
                   (currentScreen === 'recycler_dashboard'
                     ? language === 'mr'
@@ -156,7 +156,7 @@ export const Header: React.FC<HeaderProps> = ({
                     ? 'Kabadiwala Connect'
                     : 'New Scrap Weighing')}
               </span>
-              <span className="text-[12px] text-[#006948] font-bold leading-none">
+              <span className="text-[11px] text-[#006948] dark:text-[#85f8c4] font-bold leading-none truncate">
                 {currentScreen === 'login'
                   ? language === 'mr'
                     ? 'प्रवेश / भूमिका'
@@ -176,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 shrink-0">
             {/* Global High-Contrast Dark Mode Toggle */}
             <button
               id="btn-header-dark-mode"
@@ -211,20 +211,20 @@ export const Header: React.FC<HeaderProps> = ({
                   ? 'High-Contrast Dark Mode'
                   : 'डार्क मोड'
               }
-              className={`h-9 px-2.5 rounded-full flex items-center justify-center gap-1 transition-all shadow-sm active:scale-95 border cursor-pointer ${
+              className={`h-8 px-2 rounded-full flex items-center justify-center gap-1 transition-all shadow-sm active:scale-95 border cursor-pointer ${
                 isDarkMode
                   ? 'bg-[#1e293b] text-[#fbbf24] border-[#fbbf24]/40 shadow-[0_0_8px_rgba(251,191,36,0.2)]'
                   : 'bg-[#f1f5f9] text-[#334155] border-[#cbd5e1] hover:bg-[#e2e8f0]'
               }`}
             >
               <span
-                className={`material-symbols-outlined text-[18px] ${
+                className={`material-symbols-outlined text-[17px] ${
                   isDarkMode ? 'text-[#fbbf24]' : 'text-[#475569]'
                 }`}
               >
                 {isDarkMode ? 'light_mode' : 'dark_mode'}
               </span>
-              <span className="text-[12px] font-bold hidden sm:inline">
+              <span className="text-[11px] font-bold hidden sm:inline">
                 {isDarkMode
                   ? language === 'mr'
                     ? 'लाइट'
@@ -257,11 +257,11 @@ export const Header: React.FC<HeaderProps> = ({
                   : 'आवाज़ सुनें'
               }
               onClick={handleVoiceReadout}
-              className="h-9 px-3 rounded-full bg-[#ffdcc3] text-[#2f1500] flex items-center gap-1 active:scale-95 transition-transform shadow-sm"
+              className="h-8 px-2.5 rounded-full bg-[#ffdcc3] dark:bg-[#3d2306] text-[#2f1500] dark:text-[#ffedd5] flex items-center gap-1 active:scale-95 transition-transform shadow-sm border border-[#8d4b00]/20 cursor-pointer"
               type="button"
             >
-              <span className="material-symbols-outlined text-[18px] text-[#8d4b00]">volume_up</span>
-              <span className="text-[13px] font-bold">
+              <span className="material-symbols-outlined text-[17px] text-[#8d4b00] dark:text-[#fbbf24]">volume_up</span>
+              <span className="text-[12px] font-extrabold">
                 {language === 'mr' ? 'ऐका' : language === 'en' ? 'Listen' : 'सुनो'}
               </span>
             </button>
@@ -271,15 +271,15 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="btn-header-profile"
                 onClick={onOpenLogin}
-                className={`h-9 px-2.5 rounded-full flex items-center gap-1.5 shadow-sm active:scale-95 transition-all text-[12px] font-bold border ${
+                className={`h-8 px-2.5 rounded-full flex items-center gap-1 shadow-sm active:scale-95 transition-all text-[11px] font-extrabold border cursor-pointer ${
                   userProfile?.role === 'recycler'
-                    ? 'bg-[#dae2fd] text-[#131b2e] border-[#565e74]/30'
+                    ? 'bg-[#dae2fd] dark:bg-[#1f2b48] text-[#131b2e] dark:text-[#dae2fd] border-[#565e74]/30'
                     : 'bg-[#006948] text-white border-[#002114]'
                 }`}
                 title="भूमिका बदलें / लॉगआउट (Switch Role / Login)"
                 aria-label="User role profile switch"
               >
-                <span className="material-symbols-outlined text-[16px]">
+                <span className="material-symbols-outlined text-[15px]">
                   {userProfile?.role === 'recycler' ? 'factory' : 'inventory_2'}
                 </span>
                 <span className="hidden xs:inline">
@@ -292,13 +292,87 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Row 2: Status & Quick Controls (Online, Sync, and Switch after login at equal distances) */}
+        {/* Row 2: Prominently Visible Language Switcher Bar - Available on ALL pages */}
+        <div
+          id="header-language-bar"
+          className="w-full bg-[#eceef0] dark:bg-[#15232e] p-1 rounded-xl flex items-center justify-between gap-1 border border-[#bccac0]/50 dark:border-[#263b4d] shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]"
+          role="group"
+          aria-label="Language selection"
+        >
+          <div className="flex items-center gap-1 text-[#565e74] dark:text-[#94a3b8] pl-1 pr-1.5 shrink-0 select-none">
+            <span className="material-symbols-outlined text-[16px] text-[#006948] dark:text-[#85f8c4]">translate</span>
+            <span className="text-[11px] font-black hidden xs:inline">
+              {language === 'mr' ? 'भाषा:' : language === 'en' ? 'Lang:' : 'भाषा:'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-1 flex-1">
+            <button
+              id="header-btn-lang-hi"
+              type="button"
+              onClick={() => {
+                triggerHaptic(20);
+                onLanguageChange('hi');
+              }}
+              className={`py-1 px-1.5 rounded-lg flex items-center justify-center gap-1 text-[12px] font-extrabold transition-all cursor-pointer active:scale-95 select-none ${
+                language === 'hi'
+                  ? 'bg-[#006948] text-white shadow-sm ring-1 ring-[#002114]'
+                  : 'bg-white/80 dark:bg-[#1f303f] text-[#191c1e] dark:text-[#f1f5f9] hover:bg-white dark:hover:bg-[#273d50]'
+              }`}
+              aria-pressed={language === 'hi'}
+              title="हिन्दी (Hindi)"
+            >
+              <span className="text-[13px]">🇮🇳</span>
+              <span className="leading-tight">हिन्दी</span>
+            </button>
+
+            <button
+              id="header-btn-lang-en"
+              type="button"
+              onClick={() => {
+                triggerHaptic(20);
+                onLanguageChange('en');
+              }}
+              className={`py-1 px-1.5 rounded-lg flex items-center justify-center gap-1 text-[12px] font-extrabold transition-all cursor-pointer active:scale-95 select-none ${
+                language === 'en'
+                  ? 'bg-[#006948] text-white shadow-sm ring-1 ring-[#002114]'
+                  : 'bg-white/80 dark:bg-[#1f303f] text-[#191c1e] dark:text-[#f1f5f9] hover:bg-white dark:hover:bg-[#273d50]'
+              }`}
+              aria-pressed={language === 'en'}
+              title="English"
+            >
+              <span className="text-[13px]">🌐</span>
+              <span className="leading-tight">English</span>
+            </button>
+
+            <button
+              id="header-btn-lang-mr"
+              type="button"
+              onClick={() => {
+                triggerHaptic(20);
+                onLanguageChange('mr');
+              }}
+              className={`py-1 px-1.5 rounded-lg flex items-center justify-center gap-1 text-[12px] font-extrabold transition-all cursor-pointer active:scale-95 select-none ${
+                language === 'mr'
+                  ? 'bg-[#006948] text-white shadow-sm ring-1 ring-[#002114]'
+                  : 'bg-white/80 dark:bg-[#1f303f] text-[#191c1e] dark:text-[#f1f5f9] hover:bg-white dark:hover:bg-[#273d50]'
+              }`}
+              aria-pressed={language === 'mr'}
+              title="मराठी (Marathi)"
+            >
+              <span className="text-[13px]">🚩</span>
+              <span className="leading-tight">मराठी</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Row 3: Status & Quick Controls (Online, Sync, and Switch Role after login) */}
         <div
           className={`grid ${
             currentScreen !== 'login' && isLoggedIn !== false
               ? 'grid-cols-3'
               : 'grid-cols-2'
-          } gap-2 pt-1 w-full`}
+          } gap-1.5 w-full`}
         >
           <button
             id="btn-header-toggle-online"
@@ -309,35 +383,50 @@ export const Header: React.FC<HeaderProps> = ({
             }}
             title={
               isOnline
-                ? 'ऑनलाइन मोड सक्रिय है। ऑफ़लाइन टेस्ट करने के लिए क्लिक करें'
+                ? language === 'mr'
+                  ? 'ऑनलाइन मोड सुरू आहे. चाचणीसाठी ऑफलाइन करा'
+                  : language === 'en'
+                  ? 'Online mode active. Tap to test offline'
+                  : 'ऑनलाइन मोड सक्रिय है। ऑफ़लाइन टेस्ट करने के लिए क्लिक करें'
+                : language === 'mr'
+                ? 'ऑफलाइन मोड सक्रिय. पुन्हा ऑनलाइन होण्यासाठी दाबा'
+                : language === 'en'
+                ? 'Offline mode active. Tap to reconnect'
                 : 'ऑफ़लाइन मोड सक्रिय है। ऑनलाइन वापस आने के लिए क्लिक करें'
             }
             aria-label={isOnline ? 'Toggle offline mode' : 'Toggle online mode'}
-            className="w-full inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05)] text-[#006948] border border-[#bccac0]/40 hover:bg-[#f2f4f6] active:scale-95 transition-all cursor-pointer"
+            className="w-full inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-lg bg-white dark:bg-[#15232e] shadow-xs text-[#006948] dark:text-[#85f8c4] border border-[#bccac0]/40 dark:border-[#263b4d] hover:bg-[#f2f4f6] dark:hover:bg-[#1c2c3a] active:scale-95 transition-all cursor-pointer"
           >
             <span
               className={`w-2 h-2 rounded-full shrink-0 ${
-                isOnline ? 'bg-[#006948] animate-pulse' : 'bg-[#8d4b00]'
+                isOnline ? 'bg-[#006948] dark:bg-[#85f8c4] animate-pulse' : 'bg-[#8d4b00] dark:bg-[#fbbf24]'
               }`}
             />
-            <span className="text-[11px] font-bold truncate">
-              {isOnline ? 'ऑनलाइन' : 'ऑफ़लाइन'}
+            <span className="text-[10.5px] font-bold truncate">
+              {isOnline
+                ? language === 'mr' ? 'ऑनलाइन' : language === 'en' ? 'Online' : 'ऑनलाइन'
+                : language === 'mr' ? 'ऑफलाइन' : language === 'en' ? 'Offline' : 'ऑफ़लाइन'}
             </span>
           </button>
 
           <button
             id="btn-header-sync"
             onClick={onSync}
-            className="w-full inline-flex items-center justify-center gap-1 px-2 py-1 rounded-full bg-[#eceef0] text-[#3d4a42] hover:bg-[#e0e3e5] active:scale-95 transition-all text-[11px] font-bold border border-[#bccac0]/30 hover:border-[#bccac0]"
+            title={language === 'en' ? 'Sync data' : 'डेटा सिंक करें'}
+            className="w-full inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-lg bg-[#eceef0] dark:bg-[#15232e] text-[#3d4a42] dark:text-[#cbd5e1] hover:bg-[#e0e3e5] dark:hover:bg-[#1c2c3a] active:scale-95 transition-all text-[10.5px] font-bold border border-[#bccac0]/30 dark:border-[#263b4d] cursor-pointer"
           >
             <span
               className={`material-symbols-outlined text-[13px] shrink-0 ${
-                isSyncing ? 'animate-spin text-[#006948]' : ''
+                isSyncing ? 'animate-spin text-[#006948] dark:text-[#85f8c4]' : ''
               }`}
             >
               sync
             </span>
-            <span className="truncate">{isSyncing ? 'सिंक...' : 'सिंक Sync'}</span>
+            <span className="truncate">
+              {isSyncing
+                ? language === 'mr' ? 'सिंक...' : language === 'en' ? 'Syncing...' : 'सिंक...'
+                : language === 'mr' ? 'सिंक करा' : language === 'en' ? 'Sync Data' : 'सिंक Sync'}
+            </span>
           </button>
 
           {/* Quick Switch to other role shortcut button - only shown after login */}
@@ -345,10 +434,12 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenLogin}
               title="भूमिका बदलें / Switch Role"
-              className="w-full inline-flex items-center justify-center gap-1 px-2 py-1 rounded-full bg-[#e6f4ea] text-[#006948] hover:bg-[#ceebd7] active:scale-95 transition-all text-[11px] font-bold border border-[#006948]/20"
+              className="w-full inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-lg bg-[#e6f4ea] dark:bg-[#003923] text-[#006948] dark:text-[#85f8c4] hover:bg-[#ceebd7] dark:hover:bg-[#004d30] active:scale-95 transition-all text-[10.5px] font-bold border border-[#006948]/20 dark:border-[#85f8c4]/30 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[13px] shrink-0">swap_horiz</span>
-              <span className="truncate">बदलें Switch</span>
+              <span className="truncate">
+                {language === 'mr' ? 'भूमिका' : language === 'en' ? 'Switch Role' : 'बदलें Role'}
+              </span>
             </button>
           )}
         </div>

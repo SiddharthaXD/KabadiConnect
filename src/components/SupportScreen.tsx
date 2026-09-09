@@ -40,7 +40,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-24 pb-28 gap-4">
+    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-32 pb-28 gap-4">
       {/* Helpline Hero */}
       <div className="bg-[#ffdcc3] dark:bg-[#3d2306] rounded-2xl p-4 shadow-md border-2 border-[#8d4b00]/40">
         <div className="flex items-center gap-3">

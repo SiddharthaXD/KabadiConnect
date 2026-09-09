@@ -111,7 +111,7 @@ export const ScrapWeighingScreen: React.FC<ScrapWeighingScreenProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-20 pb-36 gap-3">
+    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-32 pb-36 gap-3">
       {/* Top Offline / Live Sync State Pill */}
       <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#eceef0] border border-[#bccac0]/40">
         <div className="flex items-center gap-2">

@@ -3,7 +3,6 @@ import { UserProfile, Language, Transaction, IncomingLead, EprCertificate, BulkR
 import { INITIAL_LEADS, DEFAULT_EPR_CERTIFICATE } from '../data/scrapData';
 import { TRANSLATIONS } from '../data/translations';
 import { speakVernacular, triggerHaptic } from '../utils/speech';
-import { LanguageBar } from './LanguageBar';
 import { ComplianceVerificationTab } from './recycler/ComplianceVerificationTab';
 import { RateCardManagerTab } from './recycler/RateCardManagerTab';
 import { IncomingLeadsTab } from './recycler/IncomingLeadsTab';
@@ -13,7 +12,6 @@ import { EprComplianceReportsTab } from './recycler/EprComplianceReportsTab';
 interface RecyclerDashboardProps {
   profile: UserProfile;
   language: Language;
-  onLanguageChange?: (lang: Language) => void;
   transactions: Transaction[];
   onVerifyTransaction: (txnId: string) => void;
   onAddTransaction?: (txn: Transaction) => void;
@@ -28,7 +26,6 @@ type RecyclerTab = 'leads' | 'intake' | 'rates' | 'epr' | 'compliance';
 export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
   profile,
   language,
-  onLanguageChange,
   transactions,
   onVerifyTransaction,
   onAddTransaction,
@@ -137,14 +134,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-5xl mx-auto px-3 sm:px-6 pt-24 pb-28 gap-5">
-      {/* Multilingual Selector Bar */}
-      {onLanguageChange && (
-        <div className="w-full flex justify-end">
-          <LanguageBar currentLanguage={language} onLanguageChange={onLanguageChange} />
-        </div>
-      )}
-
+    <div className="flex flex-col w-full max-w-5xl mx-auto px-3 sm:px-6 pt-32 pb-28 gap-5">
       {/* 1. Recycler Web Dashboard Header */}
       <div className="bg-gradient-to-r from-[#006948] via-[#00573c] to-[#003b29] text-white rounded-3xl p-5 sm:p-6 shadow-md border-2 border-[#002114] flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

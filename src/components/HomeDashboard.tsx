@@ -3,13 +3,11 @@ import { ScrapItem, ScreenName, Language } from '../types';
 import { SCRAP_ITEMS } from '../data/scrapData';
 import { TRANSLATIONS } from '../data/translations';
 import { speakVernacular, stopSpeech, triggerHaptic } from '../utils/speech';
-import { LanguageBar } from './LanguageBar';
 
 interface HomeDashboardProps {
   onNavigate: (screen: ScreenName) => void;
   onSelectItemForWeighing: (item: ScrapItem, initialWeight?: number) => void;
   language: Language;
-  onLanguageChange?: (lang: Language) => void;
   onSync: () => void;
   isSyncing: boolean;
   totalEarned: number;
@@ -20,7 +18,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   onNavigate,
   onSelectItemForWeighing,
   language,
-  onLanguageChange,
   onSync,
   isSyncing,
   totalEarned,
@@ -332,12 +329,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-24 pb-28 gap-4">
-      {/* Multilingual Selector Pill Bar */}
-      {onLanguageChange && (
-        <LanguageBar currentLanguage={language} onLanguageChange={onLanguageChange} />
-      )}
-
+    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-32 pb-28 gap-4">
       {/* 1. Vernacular Voice Assistance Bar */}
       <section
         id="voice-assist-banner"

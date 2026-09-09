@@ -138,7 +138,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-20 pb-28 gap-3 relative">
+    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-32 pb-28 gap-3 relative">
       {/* Confetti Canvas */}
       <div className="absolute top-16 inset-x-0 h-60 pointer-events-none z-0 overflow-hidden">
         <canvas ref={canvasRef} className="w-full h-full" />

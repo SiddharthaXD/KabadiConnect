@@ -43,7 +43,7 @@ export const LedgerScreen: React.FC<LedgerScreenProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-24 pb-28 gap-4">
+    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-32 pb-28 gap-4">
       {/* Top Banner Stats */}
       <div className="bg-[#006948] text-white rounded-2xl p-4 shadow-md border-2 border-[#002114]">
         <div className="flex items-center justify-between mb-2">

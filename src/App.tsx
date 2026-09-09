@@ -355,7 +355,6 @@ export default function App() {
           <RecyclerDashboard
             profile={userProfile}
             language={language}
-            onLanguageChange={setLanguage}
             transactions={transactions}
             onVerifyTransaction={handleVerifyTransaction}
             onAddTransaction={(newTxn) =>
@@ -377,7 +376,6 @@ export default function App() {
             onNavigate={setCurrentScreen}
             onSelectItemForWeighing={handleSelectItemForWeighing}
             language={language}
-            onLanguageChange={setLanguage}
             onSync={handleSync}
             isSyncing={isSyncing}
             totalEarned={totalEarned}
@@ -390,7 +388,6 @@ export default function App() {
           <LoginScreen
             onLogin={handleLogin}
             language={language}
-            onLanguageChange={setLanguage}
             currentRole={userRole}
             onCancel={
               isLoggedIn
@@ -509,7 +506,6 @@ export default function App() {
               <LoginScreen
                 onLogin={handleLogin}
                 language={language}
-                onLanguageChange={setLanguage}
                 currentRole={userRole}
                 onCancel={() => setShowLoginModal(false)}
                 isModal={true}

@@ -127,19 +127,19 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ onCapture, languag
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-24 pb-28 gap-3">
+    <div className="flex flex-col w-full max-w-md mx-auto px-4 pt-32 pb-28 gap-3">
       {/* 1. Vernacular Context Header Prompt Bar */}
-      <div className="w-full bg-[#dae2fd] rounded-xl p-3 flex items-center justify-between shadow-sm border-2 border-[#191c1e]">
+      <div className="w-full bg-[#dae2fd] dark:bg-[#1a2942] rounded-xl p-3 flex items-center justify-between shadow-sm border-2 border-[#191c1e] dark:border-[#38bdf8]/30">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-10 h-10 rounded-full bg-[#006948] flex items-center justify-center text-white shrink-0 shadow-sm">
             <span className="material-symbols-outlined text-[24px]">center_focus_strong</span>
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-[17px] font-bold text-[#191c1e] truncate leading-tight">
-              सामान स्कैन करें
+            <span className="text-[17px] font-bold text-[#191c1e] dark:text-[#f1f5f9] truncate leading-tight">
+              {language === 'mr' ? 'सामान स्कॅन करा' : language === 'en' ? 'Scan Scrap Item' : 'सामान स्कैन करें'}
             </span>
-            <span className="text-[12px] text-[#565e74] truncate font-medium">
-              Point camera directly at scrap
+            <span className="text-[12px] text-[#565e74] dark:text-[#94a3b8] truncate font-medium">
+              {language === 'mr' ? 'कॅमेऱ्यासमोर ई-कचरा धरा' : language === 'en' ? 'Point camera directly at scrap' : 'कैमरे के सामने सामान रखें'}
             </span>
           </div>
         </div>
@@ -149,10 +149,12 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ onCapture, languag
           id="audio-guide-btn"
           type="button"
           onClick={handleAudioGuide}
-          className="h-10 px-3 rounded-full bg-[#ffdcc3] text-[#2f1500] flex items-center gap-1.5 shrink-0 active:scale-95 transition-transform shadow-sm border border-[#8d4b00]/20"
+          className="h-10 px-3 rounded-full bg-[#ffdcc3] dark:bg-[#3d2306] text-[#2f1500] dark:text-[#ffedd5] flex items-center gap-1.5 shrink-0 active:scale-95 transition-transform shadow-sm border border-[#8d4b00]/20 cursor-pointer"
         >
-          <span className="material-symbols-outlined text-[#8d4b00] text-[18px]">volume_up</span>
-          <span className="text-[13px] font-bold">सुनो</span>
+          <span className="material-symbols-outlined text-[#8d4b00] dark:text-[#fbbf24] text-[18px]">volume_up</span>
+          <span className="text-[13px] font-bold">
+            {language === 'mr' ? 'ऐका' : language === 'en' ? 'Listen' : 'सुनो'}
+          </span>
         </button>
       </div>
 
