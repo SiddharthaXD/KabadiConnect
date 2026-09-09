@@ -189,6 +189,22 @@ export default function App() {
     }
   };
 
+  // Handle Logout
+  const handleLogout = () => {
+    triggerHaptic([30, 40]);
+    setIsLoggedIn(false);
+    setCurrentScreen('login');
+    setShowLoginModal(false);
+    speakVernacular(
+      language === 'mr'
+        ? 'यशस्वीरित्या लॉगआउट केले. कृपया पुन्हा लॉगिन करा.'
+        : language === 'en'
+        ? 'Logged out successfully. Please log in again.'
+        : 'सफलतापूर्वक लॉगआउट किया गया। कृपया दोबारा लॉगिन करें।',
+      language
+    );
+  };
+
   // Sync simulation
   const handleSync = () => {
     triggerHaptic(30);
@@ -329,10 +345,7 @@ export default function App() {
         isLoggedIn={isLoggedIn}
         isDarkMode={isDarkMode}
         onToggleDarkMode={handleToggleDarkMode}
-        onOpenLogin={() => {
-          triggerHaptic(20);
-          setShowLoginModal(true);
-        }}
+        onLogout={handleLogout}
         onToggleOnline={handleToggleOnline}
       />
 
@@ -360,10 +373,7 @@ export default function App() {
             onAddTransaction={(newTxn) =>
               setTransactions((prev) => [newTxn, ...prev.filter((t) => t.id !== newTxn.id)])
             }
-            onSwitchRole={() => {
-              triggerHaptic(25);
-              setCurrentScreen('login');
-            }}
+            onLogout={handleLogout}
             onUpdateRate={handleUpdateRate}
             isCenterOpen={userProfile.isOpen !== false}
             onToggleCenterStatus={handleToggleCenterStatus}
@@ -443,10 +453,7 @@ export default function App() {
               setActiveReceipt(INITIAL_TRANSACTIONS[0]);
             }}
             userProfile={userProfile}
-            onSwitchRole={() => {
-              triggerHaptic(20);
-              setCurrentScreen('login');
-            }}
+            onLogout={handleLogout}
           />
         )}
       </main>

@@ -7,6 +7,7 @@ export interface DashboardTranslations {
   kabadiwalaRoleName: string;
   recyclerRoleName: string;
   switchRoleBtn: string;
+  logoutBtn: string;
   verifiedPartner: string;
   cpcbAuthorized: string;
   syncNow: string;
@@ -159,6 +160,7 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     kabadiwalaRoleName: 'कबाड़ीवाला',
     recyclerRoleName: 'रिसाइक्लर',
     switchRoleBtn: 'भूमिका बदलें',
+    logoutBtn: 'लॉगआउट',
     verifiedPartner: 'सत्यापित साथी',
     cpcbAuthorized: 'CPCB अधिकृत',
     syncNow: 'सिंक करें',
@@ -308,6 +310,7 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     kabadiwalaRoleName: 'Kabadiwala',
     recyclerRoleName: 'Recycler',
     switchRoleBtn: 'Switch Role',
+    logoutBtn: 'Log Out',
     verifiedPartner: 'Verified Partner',
     cpcbAuthorized: 'CPCB Authorized',
     syncNow: 'Sync Now',
@@ -457,6 +460,7 @@ export const TRANSLATIONS: Record<Language, DashboardTranslations> = {
     kabadiwalaRoleName: 'कबाडीवाला',
     recyclerRoleName: 'रिसायकलर',
     switchRoleBtn: 'भूमिका बदला',
+    logoutBtn: 'लॉगआउट',
     verifiedPartner: 'सत्यापित साथी',
     cpcbAuthorized: 'CPCB अधिकृत',
     syncNow: 'सिंक करा',

@@ -7,7 +7,7 @@ interface SupportScreenProps {
   language: Language;
   onResetData: () => void;
   userProfile?: UserProfile;
-  onSwitchRole?: () => void;
+  onLogout?: () => void;
   transactions?: Transaction[];
   onImportTransactions?: (transactions: Transaction[]) => void;
   isOnline?: boolean;
@@ -17,7 +17,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
   language,
   onResetData,
   userProfile,
-  onSwitchRole,
+  onLogout,
 }) => {
   const isRecycler = userProfile?.role === 'recycler';
 
@@ -164,13 +164,15 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
             </div>
           </div>
 
-          {onSwitchRole && (
+          {onLogout && (
             <button
-              onClick={onSwitchRole}
-              className="px-3 py-2 rounded-xl bg-[#f2f4f6] dark:bg-[#182430] hover:bg-[#85f8c4]/40 text-[#006948] dark:text-[#34d399] font-bold text-[12px] flex items-center gap-1 border border-[#bccac0]/50 dark:border-[#33485c] active:scale-95 shrink-0 transition-colors cursor-pointer"
+              id="btn-support-logout"
+              onClick={onLogout}
+              className="px-3 py-2 rounded-xl bg-[#ffdad6] dark:bg-[#410002] hover:bg-[#ffb4ab]/60 text-[#ba1a1a] dark:text-[#ffb4ab] font-bold text-[12px] flex items-center gap-1.5 border border-[#ba1a1a]/30 active:scale-95 shrink-0 transition-colors cursor-pointer"
+              title={language === 'mr' ? 'लॉगआउट करा' : language === 'en' ? 'Log Out' : 'लॉगआउट करें'}
             >
-              <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
-              <span>{language === 'en' ? 'Change' : language === 'mr' ? 'बदला' : 'बदलें'}</span>
+              <span className="material-symbols-outlined text-[16px]">logout</span>
+              <span>{language === 'en' ? 'Log Out' : 'लॉगआउट'}</span>
             </button>
           )}
         </div>

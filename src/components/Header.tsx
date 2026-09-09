@@ -13,7 +13,8 @@ interface HeaderProps {
   isSyncing: boolean;
   title?: string;
   userProfile?: UserProfile;
-  onOpenLogin: () => void;
+  onOpenLogin?: () => void;
+  onLogout?: () => void;
   onToggleOnline?: () => void;
   isLoggedIn?: boolean;
   isDarkMode?: boolean;
@@ -31,6 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
   title,
   userProfile,
   onOpenLogin,
+  onLogout,
   onToggleOnline,
   isLoggedIn,
   isDarkMode = false,
@@ -266,18 +268,16 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </button>
 
-            {/* Profile Avatar / Role Badge (hidden when on login screen) */}
+            {/* Role Badge (hidden when on login screen) */}
             {currentScreen !== 'login' && (
-              <button
-                id="btn-header-profile"
-                onClick={onOpenLogin}
-                className={`h-8 px-2.5 rounded-full flex items-center gap-1 shadow-sm active:scale-95 transition-all text-[11px] font-extrabold border cursor-pointer ${
+              <div
+                id="header-role-badge"
+                className={`h-8 px-2.5 rounded-full flex items-center gap-1 shadow-sm text-[11px] font-extrabold border select-none ${
                   userProfile?.role === 'recycler'
                     ? 'bg-[#dae2fd] dark:bg-[#1f2b48] text-[#131b2e] dark:text-[#dae2fd] border-[#565e74]/30'
                     : 'bg-[#006948] text-white border-[#002114]'
                 }`}
-                title="भूमिका बदलें / लॉगआउट (Switch Role / Login)"
-                aria-label="User role profile switch"
+                title={userProfile?.role === 'recycler' ? 'अधिकृत रीसाइक्लर' : 'कबाड़ीवाला साथी'}
               >
                 <span className="material-symbols-outlined text-[15px]">
                   {userProfile?.role === 'recycler' ? 'factory' : 'inventory_2'}
@@ -287,7 +287,7 @@ export const Header: React.FC<HeaderProps> = ({
                     ? 'रीसाइक्लर'
                     : 'कबाड़ीवाला'}
                 </span>
-              </button>
+              </div>
             )}
           </div>
         </div>
@@ -366,7 +366,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Row 3: Status & Quick Controls (Online, Sync, and Switch Role after login) */}
+        {/* Row 3: Status & Quick Controls (Online, Sync, and Log Out after login) */}
         <div
           className={`grid ${
             currentScreen !== 'login' && isLoggedIn !== false
@@ -429,16 +429,17 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </button>
 
-          {/* Quick Switch to other role shortcut button - only shown after login */}
-          {currentScreen !== 'login' && isLoggedIn !== false && (
+          {/* Log Out button - shown after login */}
+          {currentScreen !== 'login' && isLoggedIn !== false && onLogout && (
             <button
-              onClick={onOpenLogin}
-              title="भूमिका बदलें / Switch Role"
-              className="w-full inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-lg bg-[#e6f4ea] dark:bg-[#003923] text-[#006948] dark:text-[#85f8c4] hover:bg-[#ceebd7] dark:hover:bg-[#004d30] active:scale-95 transition-all text-[10.5px] font-bold border border-[#006948]/20 dark:border-[#85f8c4]/30 cursor-pointer"
+              id="btn-header-quick-logout"
+              onClick={onLogout}
+              title={language === 'mr' ? 'लॉगआउट करा (Log Out)' : language === 'en' ? 'Log Out' : 'लॉगआउट करें (Log Out)'}
+              className="w-full inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-lg bg-[#ffdad6] dark:bg-[#410002] text-[#ba1a1a] dark:text-[#ffb4ab] hover:bg-[#ffb4ab]/50 active:scale-95 transition-all text-[10.5px] font-bold border border-[#ba1a1a]/30 cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[13px] shrink-0">swap_horiz</span>
+              <span className="material-symbols-outlined text-[13px] shrink-0">logout</span>
               <span className="truncate">
-                {language === 'mr' ? 'भूमिका' : language === 'en' ? 'Switch Role' : 'बदलें Role'}
+                {language === 'mr' ? 'लॉगआउट' : language === 'en' ? 'Log Out' : 'लॉगआउट'}
               </span>
             </button>
           )}

@@ -15,7 +15,8 @@ interface RecyclerDashboardProps {
   transactions: Transaction[];
   onVerifyTransaction: (txnId: string) => void;
   onAddTransaction?: (txn: Transaction) => void;
-  onSwitchRole: () => void;
+  onLogout?: () => void;
+  onSwitchRole?: () => void;
   onUpdateRate: (scrapId: string, newRate: number) => void;
   isCenterOpen?: boolean;
   onToggleCenterStatus?: (isOpen: boolean) => void;
@@ -29,6 +30,7 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
   transactions,
   onVerifyTransaction,
   onAddTransaction,
+  onLogout,
   onSwitchRole,
   onUpdateRate,
   isCenterOpen,
@@ -177,14 +179,17 @@ export const RecyclerDashboard: React.FC<RecyclerDashboardProps> = ({
               <span>{centerIsOpen ? (language === 'mr' ? 'सुरू (OPEN)' : language === 'en' ? 'OPEN' : 'खुला है (OPEN)') : (language === 'mr' ? 'बंद (CLOSED)' : language === 'en' ? 'CLOSED' : 'बंद है (CLOSED)')}</span>
             </button>
 
-            <button
-              onClick={onSwitchRole}
-              className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-[12px] font-bold flex items-center gap-1 active:scale-95 transition-all border border-white/30 cursor-pointer"
-              title="Switch role"
-            >
-              <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
-              <span>{t.switchRoleBtn}</span>
-            </button>
+            {(onLogout || onSwitchRole) && (
+              <button
+                id="btn-recycler-logout"
+                onClick={onLogout || onSwitchRole}
+                className="px-3 py-1.5 rounded-xl bg-[#ba1a1a]/40 hover:bg-[#ba1a1a]/70 text-white text-[12px] font-bold flex items-center gap-1 active:scale-95 transition-all border border-white/30 cursor-pointer"
+                title={language === 'mr' ? 'लॉगआउट करा (Log Out)' : language === 'en' ? 'Log Out' : 'लॉगआउट करें (Log Out)'}
+              >
+                <span className="material-symbols-outlined text-[16px]">logout</span>
+                <span>{t.logoutBtn || 'Log Out'}</span>
+              </button>
+            )}
           </div>
         </div>
 
