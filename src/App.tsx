@@ -314,7 +314,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] text-[#191c1e] flex flex-col antialiased">
+    <div className="min-h-screen bg-[#f7f9fb] dark:bg-[#0b131a] text-[#191c1e] dark:text-[#f1f5f9] flex flex-col antialiased">
       {/* Top App Header */}
       <Header
         currentScreen={currentScreen}
@@ -466,22 +466,22 @@ export default function App() {
             }
           }}
         >
-          <div className="relative w-full max-w-md max-h-[90vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden border-2 border-[#191c1e] animate-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-md max-h-[90vh] bg-white dark:bg-[#131c24] rounded-3xl shadow-2xl flex flex-col overflow-hidden border-2 border-[#191c1e] dark:border-[#33485c] animate-in zoom-in-95 duration-200">
             {/* Modal Header Bar */}
-            <div className="flex items-center justify-between px-4 py-3 bg-[#f7f9fb] border-b border-[#bccac0]/40 shrink-0">
+            <div className="flex items-center justify-between px-4 py-3 bg-[#f7f9fb] dark:bg-[#0d141b] border-b border-[#bccac0]/40 dark:border-[#263849] shrink-0">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-[#006948] text-white flex items-center justify-center font-bold shadow-sm">
                   <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[14px] font-bold text-[#191c1e] leading-tight">
+                  <span className="text-[14px] font-bold text-[#191c1e] dark:text-[#ffffff] leading-tight">
                     {language === 'mr'
                       ? 'लॉगिन / भूमिका निवडा'
                       : language === 'en'
                       ? 'Select Role / Login'
                       : 'लॉगिन / भूमिका चयन'}
                   </span>
-                  <span className="text-[11px] text-[#565e74]">
+                  <span className="text-[11px] text-[#565e74] dark:text-[#94a3b8]">
                     {language === 'mr'
                       ? 'कबाडीवाला किंवा रिसायकलर'
                       : language === 'en'
@@ -497,7 +497,7 @@ export default function App() {
                   triggerHaptic(15);
                   setShowLoginModal(false);
                 }}
-                className="w-8 h-8 rounded-full bg-[#e6e8ea] hover:bg-[#d8dbdd] flex items-center justify-center text-[#191c1e] active:scale-95 transition-all"
+                className="w-8 h-8 rounded-full bg-[#e6e8ea] dark:bg-[#1f2937] hover:bg-[#d8dbdd] dark:hover:bg-[#374151] flex items-center justify-center text-[#191c1e] dark:text-[#ffffff] active:scale-95 transition-all"
                 aria-label="Close"
               >
                 <span className="material-symbols-outlined text-[20px]">close</span>

@@ -87,9 +87,14 @@
 }
 
 .dark .bg-\[\#e6f4ea\],
-.dark .bg-\[\#c7ebd7\] {
+.dark .bg-\[\#c7ebd7\],
+.dark .bg-\[\#85f8c4\] {
   background-color: #062b1e !important;
   border-color: #006948 !important;
+}
+
+.dark .text-\[\#002114\] {
+  color: #85f8c4 !important;
 }
 
 .dark .bg-\[\#ffdad6\],
@@ -102,6 +107,32 @@
 .dark .bg-\[\#ffdcc3\] {
   background-color: #3d2306 !important;
   color: #ffedd5 !important;
+}
+
+/* High-contrast text colors on colored backgrounds in Dark Mode */
+.dark .text-\[\#2f1500\],
+.dark .text-\[\#8d4b00\],
+.dark .text-\[\#6e3900\],
+.dark .text-\[\#b15f00\] {
+  color: #fcd34d !important;
+}
+
+.dark .text-\[\#ba1a1a\],
+.dark .text-\[\#93000a\],
+.dark .text-\[\#410002\] {
+  color: #f87171 !important;
+}
+
+.dark .text-\[\#131b2e\],
+.dark .text-\[\#003b8e\],
+.dark .text-\[\#5c647a\] {
+  color: #93c5fd !important;
+}
+
+.dark .text-\[\#006948\],
+.dark .text-\[\#005137\],
+.dark .text-\[\#00855d\] {
+  color: #34d399 !important;
 }
 
 .dark input,

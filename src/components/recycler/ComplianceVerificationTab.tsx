@@ -385,7 +385,7 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
               className={`flex-1 sm:flex-none px-4 h-10 rounded-xl text-[12px] font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 isCenterOpen
                   ? 'bg-[#006948] text-white shadow-sm'
-                  : 'bg-[#e6e8ea] dark:bg-[#1f2937] text-[#565e74] hover:text-[#191c1e]'
+                  : 'bg-[#e6e8ea] dark:bg-[#1f2937] text-[#565e74] dark:text-[#94a3b8] hover:text-[#191c1e] dark:hover:text-white'
               }`}
             >
               <span className="material-symbols-outlined text-[16px]">check_circle</span>
@@ -398,7 +398,7 @@ export const ComplianceVerificationTab: React.FC<ComplianceVerificationTabProps>
               className={`flex-1 sm:flex-none px-4 h-10 rounded-xl text-[12px] font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 !isCenterOpen
                   ? 'bg-[#ba1a1a] text-white shadow-sm'
-                  : 'bg-[#e6e8ea] dark:bg-[#1f2937] text-[#565e74] hover:text-[#ba1a1a]'
+                  : 'bg-[#e6e8ea] dark:bg-[#1f2937] text-[#565e74] dark:text-[#94a3b8] hover:text-[#ba1a1a]'
               }`}
             >
               <span className="material-symbols-outlined text-[16px]">cancel</span>

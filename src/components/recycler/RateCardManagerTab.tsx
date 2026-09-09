@@ -275,7 +275,7 @@ export const RateCardManagerTab: React.FC<RateCardManagerTabProps> = ({
               ? 'Bulk Sourcing Incentive Rule'
               : 'थोक खरीद प्रोत्साहन नियम'}
           </h4>
-          <p className="text-[12px] text-[#565e74] dark:text-[#cbd5e1] mt-0.5">
+          <p className="text-[12px] text-[#4a2800] dark:text-[#cbd5e1] mt-0.5">
             {language === 'en'
               ? 'Offering a +₹15 to +₹25 per KG bulk premium attracts high-volume aggregated lots from tier-1 kabadiwalas, increasing your monthly EPR quota fulfillment speed by 3.4x.'
               : 'बल्क प्रीमियम पेश करने से बड़े कबाड़ी सीधे आपकी इकाई में माल लाते हैं, जिससे आपकी EPR लक्ष्य पूर्ति दर तेजी से बढ़ती है।'}

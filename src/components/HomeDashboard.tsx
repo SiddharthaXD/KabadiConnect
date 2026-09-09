@@ -31,10 +31,144 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   const [selectedScrapId, setSelectedScrapId] = useState<string>(SCRAP_ITEMS[0].id);
   const [transcript, setTranscript] = useState<string>('');
   const [speechMode, setSpeechMode] = useState<'stt' | 'tts'>('stt');
+  const [sttEngine, setSttEngine] = useState<'gemini' | 'browser'>('gemini');
+  const [sttLang, setSttLang] = useState<'mr-IN' | 'hi-IN' | 'en-IN' | 'auto'>('auto');
   const [isListening, setIsListening] = React.useState<boolean>(false);
+  const [isRecordingAudio, setIsRecordingAudio] = useState<boolean>(false);
+  const [recordingSeconds, setRecordingSeconds] = useState<number>(0);
+  const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
+  const [isEnhancing, setIsEnhancing] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
-  const recognitionRef = React.useRef<any>(null);
 
+  const recognitionRef = React.useRef<any>(null);
+  const finalTranscriptRef = React.useRef<string>('');
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const audioChunksRef = React.useRef<Blob[]>([]);
+  const recordingTimerRef = React.useRef<any>(null);
+
+  // Timer counter for audio recording
+  React.useEffect(() => {
+    if (isRecordingAudio) {
+      setRecordingSeconds(0);
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingSeconds((prev) => prev + 1);
+      }, 1000);
+    } else {
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
+    }
+    return () => {
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
+    };
+  }, [isRecordingAudio]);
+
+  // High-precision Gemini AI Voice Recorder
+  const handleToggleGeminiRecording = async () => {
+    triggerHaptic(20);
+
+    if (isRecordingAudio) {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      setIsRecordingAudio(false);
+      return;
+    }
+
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert(
+          language === 'en'
+            ? 'Microphone access is not supported on this browser.'
+            : 'आपके ब्राउज़र में माइक्रोफ़ोन सपोर्ट उपलब्ध नहीं है।'
+        );
+        return;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+
+      let mimeType = 'audio/webm';
+      if (typeof MediaRecorder !== 'undefined' && !MediaRecorder.isTypeSupported('audio/webm')) {
+        if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
+        else if (MediaRecorder.isTypeSupported('audio/ogg')) mimeType = 'audio/ogg';
+        else mimeType = '';
+      }
+
+      const mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+
+        const finalMime = mediaRecorder.mimeType || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type: finalMime });
+
+        if (audioBlob.size === 0) return;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const resultStr = reader.result as string;
+          const base64Data = resultStr.includes(',') ? resultStr.split(',')[1] : resultStr;
+
+          if (!base64Data) return;
+
+          setIsTranscribing(true);
+          try {
+            const res = await fetch('/api/transcribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                audioBase64: base64Data,
+                mimeType: finalMime,
+                language,
+              }),
+            });
+            const data = await res.json();
+            if (data.transcript) {
+              setTranscript((prev) => {
+                const cleaned = data.transcript.trim();
+                return prev ? `${prev} ${cleaned}` : cleaned;
+              });
+              speakVernacular(
+                language === 'mr'
+                  ? 'आवाज अचूकपणे मजकुरात बदलला आहे.'
+                  : language === 'hi'
+                  ? 'आवाज़ को सटीकता के साथ टाइप कर दिया गया है।'
+                  : 'Voice transcribed with high precision.',
+                language
+              );
+            }
+          } catch (err) {
+            console.error('Audio transcription error:', err);
+          } finally {
+            setIsTranscribing(false);
+          }
+        };
+      };
+
+      mediaRecorder.start(250);
+      setIsRecordingAudio(true);
+    } catch (err: any) {
+      console.error('Mic access error:', err);
+      alert(
+        language === 'en'
+          ? 'Microphone permission denied or unavailable.'
+          : 'माइक्रोफ़ोन अनुमति स्वीकृत नहीं हुई।'
+      );
+    }
+  };
+
+  // Browser Speech Recognition with non-duplicating finalTranscript logic
   const handleToggleListen = () => {
     triggerHaptic(20);
     if (isListening) {
@@ -47,38 +181,50 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert(language === 'en' ? 'Speech recognition is not supported in your browser.' : 'आपके ब्राउज़र में वॉयस टाइपिंग समर्थित नहीं है।');
+      alert(
+        language === 'en'
+          ? 'Live browser speech recognition is not supported on this browser. Use Gemini AI Voice Recorder instead!'
+          : 'आपके ब्राउज़र में लाइव वॉयस टाइपिंग समर्थित नहीं है। कृपया Gemini AI आवाज़ रेकॉर्डर का उपयोग करें!'
+      );
       return;
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = language === 'mr' ? 'mr-IN' : language === 'hi' ? 'hi-IN' : 'en-IN';
+    const activeLang =
+      sttLang === 'auto'
+        ? language === 'mr'
+          ? 'mr-IN'
+          : language === 'hi'
+          ? 'hi-IN'
+          : 'en-IN'
+        : sttLang;
+
+    recognition.lang = activeLang;
     recognition.continuous = true;
     recognition.interimResults = true;
 
+    finalTranscriptRef.current = transcript.trim();
+
     recognition.onresult = (event: any) => {
-      let currentTranscript = '';
-      for (let i = 0; i < event.results.length; i++) {
-        currentTranscript += event.results[i][0].transcript;
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const textChunk = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscriptRef.current += ' ' + textChunk.trim();
+        } else {
+          interimTranscript += ' ' + textChunk;
+        }
       }
-      setTranscript(currentTranscript);
+
+      const combined = (finalTranscriptRef.current + ' ' + interimTranscript)
+        .replace(/\s+/g, ' ')
+        .trim();
+      setTranscript(combined);
     };
 
     recognition.onerror = (event: any) => {
       console.warn('Speech recognition status/error:', event.error);
       setIsListening(false);
-      if (event.error === 'network' || (typeof navigator !== 'undefined' && !navigator.onLine)) {
-        // Voice assistance feedback for offline mode
-        speakVernacular(
-          language === 'mr'
-            ? 'ऑफलाइन मोडमध्ये वरील मजकूर निवडा किंवा टाईप करून आवाज ऐका.'
-            : language === 'hi'
-            ? 'ऑफ़लाइन मोड में टेक्स्ट चुनें या बोलकर सुनने के लिए प्ले दबाएं।'
-            : 'In offline mode, select preset voice cards or use text to speech.',
-          language,
-          true
-        );
-      }
     };
 
     recognition.onend = () => {
@@ -88,6 +234,36 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     recognitionRef.current = recognition;
     recognition.start();
     setIsListening(true);
+  };
+
+  // AI Accuracy Refiner to clean up typos and voice errors
+  const handleEnhanceTranscript = async () => {
+    if (!transcript || !transcript.trim()) return;
+    triggerHaptic(20);
+    setIsEnhancing(true);
+    try {
+      const res = await fetch('/api/enhance-transcript', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: transcript, language }),
+      });
+      const data = await res.json();
+      if (data.enhancedText) {
+        setTranscript(data.enhancedText);
+        speakVernacular(
+          language === 'mr'
+            ? 'मजकूर अचूकता सुधारली आहे.'
+            : language === 'hi'
+            ? 'टेक्स्ट की सटीकता सुधार दी गई है।'
+            : 'Transcript accuracy enhanced by AI.',
+          language
+        );
+      }
+    } catch (err) {
+      console.error('Enhance transcript error:', err);
+    } finally {
+      setIsEnhancing(false);
+    }
   };
 
   const handleSpeakText = () => {
@@ -123,6 +299,10 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     if (isListening && recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
+    }
+    if (isRecordingAudio && mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecordingAudio(false);
     }
     if (isSpeaking) {
       stopSpeech();
@@ -659,10 +839,10 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               <span className="text-[16px] font-black text-[#191c1e]">
                 {speechMode === 'stt'
                   ? language === 'en'
-                    ? 'Speech to Text (STT)'
+                    ? 'AI Speech to Text (Voice Typing)'
                     : language === 'mr'
-                    ? 'स्पीच टू टेक्स्ट (आवाज टाईपिंग)'
-                    : 'स्पीच टू टेक्स्ट (आवाज़ टाइपिंग)'
+                    ? 'स्मार्ट आवाज टाईपिंग (AI Transcriber)'
+                    : 'स्मार्ट आवाज़ टाइपिंग (AI Transcriber)'
                   : language === 'en'
                   ? 'Text to Speech (TTS)'
                   : language === 'mr'
@@ -672,12 +852,30 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
 
             {/* Live active badges */}
-            {speechMode === 'stt' && isListening && (
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#ba1a1a]/10 text-[#ba1a1a] text-[10px] font-bold uppercase animate-pulse border border-[#ba1a1a]/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]"></span>
+            {speechMode === 'stt' && isRecordingAudio && (
+              <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ba1a1a] text-white text-[11px] font-bold uppercase animate-pulse shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                <span>
+                  {language === 'en' ? 'Recording' : language === 'mr' ? 'रेकॉर्डिंग...' : 'रेकॉर्डिंग...'}{' '}
+                  00:{recordingSeconds < 10 ? `0${recordingSeconds}` : recordingSeconds}
+                </span>
+              </span>
+            )}
+
+            {speechMode === 'stt' && isTranscribing && (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#006948] text-white text-[11px] font-bold shadow-sm">
+                <span className="material-symbols-outlined text-[14px] animate-spin">sync</span>
+                <span>{language === 'en' ? 'AI Transcribing...' : language === 'mr' ? 'AI ट्रान्सक्राइब...' : 'AI टाइपिंग...'}</span>
+              </span>
+            )}
+
+            {speechMode === 'stt' && isListening && !isRecordingAudio && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#003b8e]/10 text-[#003b8e] text-[10px] font-bold uppercase animate-pulse border border-[#003b8e]/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#003b8e]"></span>
                 {language === 'en' ? 'Listening...' : language === 'mr' ? 'ऐकत आहे...' : 'सुन रहा है...'}
               </span>
             )}
+
             {speechMode === 'tts' && isSpeaking && (
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#006948]/10 text-[#006948] text-[10px] font-bold uppercase animate-pulse border border-[#006948]/30">
                 <span className="material-symbols-outlined text-[12px] animate-bounce">graphic_eq</span>
@@ -715,14 +913,90 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           </div>
         </div>
 
+        {/* STT Engine & Language Sub-bar */}
+        {speechMode === 'stt' && (
+          <div className="flex flex-col gap-1.5 p-2 rounded-lg bg-white/80 border border-[#003b8e]/20 text-[11px]">
+            <div className="flex items-center justify-between gap-1">
+              <span className="font-bold text-[#003b8e]">
+                {language === 'en' ? 'Voice Engine:' : language === 'mr' ? 'आवाज इंजिन:' : 'आवाज़ इंजन:'}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic(10);
+                    setSttEngine('gemini');
+                  }}
+                  className={`px-2 py-0.5 rounded-md font-bold transition-all border ${
+                    sttEngine === 'gemini'
+                      ? 'bg-[#006948] text-white border-[#006948]'
+                      : 'bg-white text-[#565e74] border-[#bccac0]'
+                  }`}
+                >
+                  ⚡ Gemini AI Audio (100% Exact)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic(10);
+                    setSttEngine('browser');
+                  }}
+                  className={`px-2 py-0.5 rounded-md font-bold transition-all border ${
+                    sttEngine === 'browser'
+                      ? 'bg-[#003b8e] text-white border-[#003b8e]'
+                      : 'bg-white text-[#565e74] border-[#bccac0]'
+                  }`}
+                >
+                  🎙️ Live Browser Speech
+                </button>
+              </div>
+            </div>
+
+            {sttEngine === 'browser' && (
+              <div className="flex items-center justify-between gap-1 pt-1 border-t border-[#003b8e]/10">
+                <span className="font-bold text-[#003b8e]">
+                  {language === 'en' ? 'Dialect:' : language === 'mr' ? 'भाषा निवडा:' : 'भाषा चुनें:'}
+                </span>
+                <div className="flex items-center gap-1 overflow-x-auto">
+                  {[
+                    { id: 'auto', label: 'Auto' },
+                    { id: 'hi-IN', label: 'हिंदी' },
+                    { id: 'mr-IN', label: 'मराठी' },
+                    { id: 'en-IN', label: 'English' },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setSttLang(item.id as any)}
+                      className={`px-2 py-0.5 rounded-md font-bold text-[10px] transition-all border ${
+                        sttLang === item.id
+                          ? 'bg-[#003b8e] text-white border-[#003b8e]'
+                          : 'bg-white text-[#191c1e] border-[#bccac0]'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Guidance Prompt */}
         <p className="text-[12px] text-[#003b8e] font-medium leading-tight">
           {speechMode === 'stt'
-            ? language === 'en'
-              ? 'Tap the microphone and speak. The app will type your words automatically.'
+            ? sttEngine === 'gemini'
+              ? language === 'en'
+                ? 'Tap "Record Voice" and speak clearly. Gemini AI will transcribe your voice into exact text.'
+                : language === 'mr'
+                ? '"रेकॉर्ड करा" दाबा आणि स्पष्ट बोला. जेमिनी AI तुमचे बोलणे अचूक मजकुरात बदलेल.'
+                : '"रेकॉर्ड करें" दबाएं और स्पष्ट बोलें। Gemini AI आपकी आवाज़ को सटीक टेक्स्ट में बदलेगा।'
+              : language === 'en'
+              ? 'Tap microphone to start continuous speech typing with real-time word assembly.'
               : language === 'mr'
-              ? 'मायक्रोफोन दाबा आणि बोला. ॲप तुमचे शब्द आपोआप टाईप करेल.'
-              : 'माइक्रोफोन दबाएं और बोलें। ऐप आपके शब्दों को अपने आप टाइप करेगा।'
+              ? 'थेट मायक्रोफोन द्वारे सलग आवाज टाईपिंग सुरू करण्यासाठी दाबा.'
+              : 'लाइव आवाज़ से टाइप करने के लिए माइक्रोफ़ोन बटन दबाएं।'
             : language === 'en'
             ? 'Type or paste text below and tap "Read Aloud" to hear clear vernacular voice playback.'
             : language === 'mr'
@@ -787,53 +1061,128 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           </div>
         )}
 
-        <textarea
-          value={transcript}
-          onChange={(e) => setTranscript(e.target.value)}
-          placeholder={
-            speechMode === 'stt'
-              ? language === 'en'
-                ? 'Your speech will appear here...'
+        <div className="relative w-full">
+          <textarea
+            value={transcript}
+            onChange={(e) => setTranscript(e.target.value)}
+            placeholder={
+              speechMode === 'stt'
+                ? isTranscribing
+                  ? language === 'en'
+                    ? 'Gemini AI is transcribing your recorded voice...'
+                    : language === 'mr'
+                    ? 'जेमिनी AI तुमचा आवाज अचूक मजकुरात बदलत आहे...'
+                    : 'Gemini AI आपकी आवाज़ को सटीक टेक्स्ट में बदल रहा है...'
+                  : language === 'en'
+                  ? 'Your exact voice transcript will appear here...'
+                  : language === 'mr'
+                  ? 'तुमचे अचूक बोलणे येथे टाईप दिसेल...'
+                  : 'आपकी आवाज़ का सटीक टेक्स्ट यहाँ टाइप होगा...'
+                : language === 'en'
+                ? 'Enter text to convert into speech...'
                 : language === 'mr'
-                ? 'तुमचे बोलणे येथे दिसेल...'
-                : 'आपकी आवाज़ यहाँ टाइप होगी...'
-              : language === 'en'
-              ? 'Enter text to convert into speech...'
-              : language === 'mr'
-              ? 'आवाजात ऐकण्यासाठी मजकूर येथे टाईप करा...'
-              : 'आवाज़ में सुनने के लिए टेक्स्ट यहाँ टाइप करें...'
-          }
-          className="w-full bg-white border border-[#003b8e]/30 rounded-lg p-3 text-[14px] font-medium text-[#191c1e] outline-none focus:border-[#003b8e] min-h-[85px] resize-none shadow-inner"
-        />
+                ? 'आवाजात ऐकण्यासाठी मजकूर येथे टाईप करा...'
+                : 'आवाज़ में सुनने के लिए टेक्स्ट यहाँ टाइप करें...'
+            }
+            className="w-full bg-white border border-[#003b8e]/30 rounded-lg p-3 text-[14px] font-medium text-[#191c1e] outline-none focus:border-[#003b8e] min-h-[95px] resize-none shadow-inner pr-10"
+          />
+
+          {/* AI Accuracy Enhancer Floating Tooltip */}
+          {transcript.trim().length > 3 && (
+            <button
+              type="button"
+              onClick={handleEnhanceTranscript}
+              disabled={isEnhancing}
+              title={
+                language === 'en'
+                  ? 'AI Fix & Enhance Transcript Accuracy'
+                  : language === 'mr'
+                  ? 'मजकूर अचूकता सुधारा'
+                  : 'AI से सटीकता सुधारें'
+              }
+              className="absolute top-2.5 right-2.5 p-1.5 rounded-md bg-[#006948] text-white hover:bg-[#005137] active:scale-95 shadow-sm transition-all flex items-center justify-center cursor-pointer"
+            >
+              <span
+                className={`material-symbols-outlined text-[18px] ${
+                  isEnhancing ? 'animate-spin' : ''
+                }`}
+              >
+                auto_fix_high
+              </span>
+            </button>
+          )}
+        </div>
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
           {speechMode === 'stt' ? (
-            <button
-              onClick={handleToggleListen}
-              className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all ${
-                isListening ? 'bg-[#ba1a1a]' : 'bg-[#003b8e]'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[20px]">{isListening ? 'mic_off' : 'mic'}</span>
-              <span>
-                {isListening
-                  ? language === 'en'
-                    ? 'Stop Listening'
+            sttEngine === 'gemini' ? (
+              <button
+                type="button"
+                onClick={handleToggleGeminiRecording}
+                disabled={isTranscribing}
+                className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all cursor-pointer ${
+                  isRecordingAudio
+                    ? 'bg-[#ba1a1a] animate-pulse'
+                    : isTranscribing
+                    ? 'bg-[#006948]/80'
+                    : 'bg-[#006948]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  {isRecordingAudio ? 'stop' : isTranscribing ? 'sync' : 'mic'}
+                </span>
+                <span>
+                  {isRecordingAudio
+                    ? language === 'en'
+                      ? 'Stop & Transcribe'
+                      : language === 'mr'
+                      ? 'रेकॉर्डिंग थांबवा'
+                      : 'रेकॉर्डिंग रोकें'
+                    : isTranscribing
+                    ? language === 'en'
+                      ? 'AI Transcribing...'
+                      : language === 'mr'
+                      ? 'AI काम करत आहे...'
+                      : 'AI टाइपिंग...'
+                    : language === 'en'
+                    ? 'Record Voice (Gemini AI)'
                     : language === 'mr'
-                    ? 'थांबवा'
-                    : 'रोकें'
-                  : language === 'en'
-                  ? 'Start Listening'
-                  : language === 'mr'
-                  ? 'बोलायला सुरू करा'
-                  : 'बोलना शुरू करें'}
-              </span>
-            </button>
+                    ? 'आवाज रेकॉर्ड करा (AI)'
+                    : 'आवाज़ रेकॉर्ड करें (AI)'}
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleToggleListen}
+                className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all cursor-pointer ${
+                  isListening ? 'bg-[#ba1a1a]' : 'bg-[#003b8e]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  {isListening ? 'mic_off' : 'mic'}
+                </span>
+                <span>
+                  {isListening
+                    ? language === 'en'
+                      ? 'Stop Listening'
+                      : language === 'mr'
+                      ? 'थांबवा'
+                      : 'रोकें'
+                    : language === 'en'
+                    ? 'Start Live Voice Typing'
+                    : language === 'mr'
+                    ? 'लाईव्ह टाईपिंग सुरू करा'
+                    : 'लाइव टाइपिंग शुरू करें'}
+                </span>
+              </button>
+            )
           ) : (
             <button
+              type="button"
               onClick={handleSpeakText}
-              className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all ${
+              className={`flex-1 h-11 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-[0_2px_0px_#191c1e] transition-all cursor-pointer ${
                 isSpeaking ? 'bg-[#ba1a1a]' : 'bg-[#006948]'
               }`}
             >
@@ -856,18 +1205,32 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </button>
           )}
 
-          <button
-            onClick={() => {
-              triggerHaptic(10);
-              // Search action intentionally left blank to yield no result
-            }}
-            className="w-11 h-11 bg-white border border-[#003b8e]/30 rounded-xl flex items-center justify-center text-[#006948] active:scale-95 shadow-sm transition-transform hover:bg-[#006948]/10"
-            title={language === 'en' ? 'Search Web' : language === 'mr' ? 'वेब शोधा' : 'वेब खोजें'}
-          >
-            <span className="material-symbols-outlined text-[20px]">search</span>
-          </button>
+          {speechMode === 'stt' && (
+            <button
+              type="button"
+              onClick={handleEnhanceTranscript}
+              disabled={isEnhancing || !transcript.trim()}
+              className="h-11 px-3 bg-white border border-[#003b8e]/30 rounded-xl flex items-center justify-center text-[#006948] active:scale-95 shadow-sm transition-transform hover:bg-[#006948]/10 cursor-pointer disabled:opacity-50"
+              title={
+                language === 'en'
+                  ? 'AI Refine Accuracy'
+                  : language === 'mr'
+                  ? 'अचूकता सुधारा'
+                  : 'सटीकता सुधारें'
+              }
+            >
+              <span
+                className={`material-symbols-outlined text-[20px] ${
+                  isEnhancing ? 'animate-spin' : ''
+                }`}
+              >
+                auto_fix_high
+              </span>
+            </button>
+          )}
 
           <button
+            type="button"
             onClick={() => {
               triggerHaptic(10);
               setTranscript('');
@@ -876,7 +1239,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                 setIsSpeaking(false);
               }
             }}
-            className="w-11 h-11 bg-white border border-[#003b8e]/30 rounded-xl flex items-center justify-center text-[#ba1a1a] active:scale-95 shadow-sm transition-transform hover:bg-[#ba1a1a]/10"
+            className="w-11 h-11 bg-white border border-[#003b8e]/30 rounded-xl flex items-center justify-center text-[#ba1a1a] active:scale-95 shadow-sm transition-transform hover:bg-[#ba1a1a]/10 cursor-pointer"
             title={language === 'en' ? 'Clear Text' : language === 'mr' ? 'मजकूर पुसा' : 'टेक्स्ट साफ़ करें'}
           >
             <span className="material-symbols-outlined text-[20px]">delete_sweep</span>
