@@ -409,7 +409,11 @@ export default function App() {
         )}
 
         {currentScreen === 'scanner' && (
-          <CameraScanner onCapture={handleCaptureScrap} language={language} />
+          <CameraScanner
+            onCapture={handleCaptureScrap}
+            language={language}
+            onCancel={() => setCurrentScreen('home')}
+          />
         )}
 
         {currentScreen === 'weighing' && (
