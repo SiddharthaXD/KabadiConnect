@@ -21,6 +21,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const [torchOn, setTorchOn] = useState<boolean>(false);
   const [cameraStatus, setCameraStatus] = useState<CameraStatus>('starting');
   const [isUsingWebcam, setIsUsingWebcam] = useState<boolean>(false);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [hasMultipleCameras, setHasMultipleCameras] = useState<boolean>(false);
   const [isListening, setIsListening] = useState<boolean>(false);
@@ -44,13 +45,42 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       });
       mediaStreamRef.current = null;
     }
+    setMediaStream(null);
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
     setIsUsingWebcam(false);
   };
 
-  // Start mobile camera (rear prioritized) or laptop/PC webcam
+  // Synchronize stream with always-mounted video element
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (mediaStream) {
+      video.srcObject = mediaStream;
+      video.muted = true;
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
+
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsUsingWebcam(true);
+            setCameraStatus('active');
+          })
+          .catch((err) => {
+            console.warn('Video auto-play interrupted:', err);
+          });
+      }
+    } else {
+      video.srcObject = null;
+      setIsUsingWebcam(false);
+    }
+  }, [mediaStream]);
+
+  // Start mobile camera (rear prioritized) or laptop/PC webcam with multi-tier fallback
   const startCamera = async (mode: 'environment' | 'user') => {
     stopCamera();
     setCameraStatus('starting');
@@ -61,49 +91,91 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       setCameraStatus('unsupported');
       setErrorMessage(
         language === 'mr'
-          ? 'तुमच्या ब्राउझरमध्ये थेट कॅमेरा समर्थित नाही. कृपया खालील बटणाने फोटो काढा.'
+          ? 'तुमच्या ब्राउझरमध्ये थेट कॅमेरा स्ट्रीम समर्थित नाही. खालील बटणाने थेट फोन कॅमेरा वापरा.'
           : language === 'en'
-          ? 'Live camera is not supported in this browser. Please use the take photo button below.'
-          : 'आपके ब्राउज़र में सीधा कैमरा समर्थित नहीं है। कृपया नीचे दिए गए बटन से फ़ोटो लें।'
+          ? 'Live camera stream is not supported in this browser. Please tap below to open phone camera.'
+          : 'आपके ब्राउज़र में सीधा कैमरा स्ट्रीम समर्थित नहीं है। नीचे दिए बटन से फ़ोन कैमरा उपयोग करें।'
       );
       return;
     }
 
-    try {
-      let stream: MediaStream | null = null;
+    // Constraint ladder for resilient mobile and desktop camera access:
+    // 1: Phone rear camera with ideal facingMode (no rigid resolution to prevent overconstrained errors)
+    // 2: String facingMode
+    // 3: Ideal facingMode with 1280x720 preferred
+    // 4: Universal video: true
+    const candidateConstraints: MediaStreamConstraints[] = [
+      {
+        video: {
+          facingMode: { ideal: mode },
+        },
+        audio: false,
+      },
+      {
+        video: {
+          facingMode: mode,
+        },
+        audio: false,
+      },
+      {
+        video: {
+          facingMode: { ideal: mode },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      },
+      {
+        video: true,
+        audio: false,
+      },
+    ];
 
-      // Primary attempt: request preferred facingMode ('environment' for phone back camera, 'user' for front/laptop)
+    let stream: MediaStream | null = null;
+    let lastError: unknown = null;
+
+    for (const constraints of candidateConstraints) {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: mode },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-          audio: false,
-        });
-      } catch (firstErr) {
-        console.warn('Strict facingMode constraint failed, trying basic video constraints:', firstErr);
-        // Secondary attempt: standard video for laptop webcams / PC webcams
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false,
-        });
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        if (stream && stream.getVideoTracks().length > 0) {
+          break;
+        }
+      } catch (err: unknown) {
+        lastError = err;
+        console.warn('Camera constraint attempt failed:', constraints, err);
+        // If permission was explicitly denied, do not keep prompting the user
+        const errObj = err as { name?: string };
+        if (
+          errObj?.name === 'NotAllowedError' ||
+          errObj?.name === 'PermissionDeniedError' ||
+          errObj?.name === 'SecurityError'
+        ) {
+          break;
+        }
       }
+    }
 
+    if (stream) {
       mediaStreamRef.current = stream;
+      setMediaStream(stream);
 
+      // Also attach to video element directly if already ready
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch((err) => {
-            console.warn('Video auto-play interrupted:', err);
+        videoRef.current.muted = true;
+        videoRef.current.setAttribute('playsinline', 'true');
+        videoRef.current.setAttribute('webkit-playsinline', 'true');
+        videoRef.current
+          .play()
+          .then(() => {
+            setIsUsingWebcam(true);
+            setCameraStatus('active');
+          })
+          .catch((playErr) => {
+            console.warn('Initial video play error:', playErr);
           });
-        };
       }
 
-      setIsUsingWebcam(true);
-      setCameraStatus('active');
       setErrorMessage(null);
 
       // Check if device has multiple cameras (e.g. front & back on mobile phones)
@@ -116,44 +188,32 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           // ignore
         }
       }
-    } catch (err: unknown) {
-      console.warn('Error opening device camera/webcam:', err);
+    } else {
       setIsUsingWebcam(false);
+      setMediaStream(null);
 
-      const errorObj = err as { name?: string; message?: string };
+      const errorObj = lastError as { name?: string; message?: string } | null;
       if (
-        errorObj.name === 'NotAllowedError' ||
-        errorObj.name === 'PermissionDeniedError' ||
-        errorObj.name === 'SecurityError'
+        errorObj?.name === 'NotAllowedError' ||
+        errorObj?.name === 'PermissionDeniedError' ||
+        errorObj?.name === 'SecurityError'
       ) {
         setCameraStatus('denied');
         setErrorMessage(
           language === 'mr'
-            ? 'कॅमेरा परवानगी आवश्यक आहे. कृपया ब्राउझरमध्ये परवानगी द्या.'
+            ? 'कॅमेरा परवानगी नाकारली गेली. कृपया खालील बटणाने थेट फोन कॅमेरा उघडा.'
             : language === 'en'
-            ? 'Camera access permission was denied. Please allow camera in browser settings.'
-            : 'कैमरा अनुमति अस्वीकृत है। कृपया ब्राउज़र में कैमरा एक्सेस की अनुमति दें।'
-        );
-      } else if (
-        errorObj.name === 'NotFoundError' ||
-        errorObj.name === 'DevicesNotFoundError'
-      ) {
-        setCameraStatus('error');
-        setErrorMessage(
-          language === 'mr'
-            ? 'कोणताही कॅमेरा आढळला नाही. कृपया सिमुलेशन वापरा किंवा फोटो अपलोड करा.'
-            : language === 'en'
-            ? 'No camera detected on this PC or phone. Use simulation or upload photo.'
-            : 'कोई कैमरा नहीं मिला। कृपया सिमुलेशन का उपयोग करें या फ़ोटो अपलोड करें।'
+            ? 'Camera access denied. Tap below to use your phone camera or allow browser permissions.'
+            : 'कैमरा अनुमति अस्वीकृत है। कृपया नीचे दिए बटन से फ़ोन कैमरा उपयोग करें।'
         );
       } else {
         setCameraStatus('error');
         setErrorMessage(
           language === 'mr'
-            ? 'कॅमेरा सुरू करताना त्रुटी आली. पुन्हा प्रयत्न करा किंवा थेट फोटो निवडा.'
+            ? 'थेट कॅमेरा सुरू करता आला नाही. काळजी करू नका, खालील बटणाने थेट फोनचा कॅमेरा उघडा.'
             : language === 'en'
-            ? 'Could not start camera. Please retry or pick a photo directly.'
-            : 'कैमरा शुरू करने में समस्या आई। कृपया पुनः प्रयास करें या फ़ोटो चुनें।'
+            ? 'Could not start live stream. Tap below to open your phone camera directly.'
+            : 'सीधा कैमरा नहीं खुल सका। नीचे दिए गए बटन से सीधे फ़ोन का कैमरा खोलें।'
         );
       }
     }
@@ -251,8 +311,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     }
   };
 
-  // Capture photo from live camera frame or fallback
+  // Capture photo from live camera frame or fallback to native phone camera
   const triggerShutter = () => {
+    // If live webcam/stream is not streaming frames, directly open native phone camera
+    if (!isUsingWebcam) {
+      triggerHaptic(30);
+      fileInputRef.current?.click();
+      return;
+    }
+
     triggerHaptic([40, 60, 40]);
     setIsCapturing(true);
     speakVernacular(TRANSLATIONS[language].globalSpeech.photoCapturedProcessing, language);
@@ -260,7 +327,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     let capturedUrl = selectedItem.imageUrl || CAMERA_PREVIEW_IMG;
 
     // Grab actual live frame from the video stream
-    if (videoRef.current && isUsingWebcam && videoRef.current.videoWidth > 0) {
+    if (videoRef.current && videoRef.current.videoWidth > 0) {
       try {
         const canvas = document.createElement('canvas');
         canvas.width = videoRef.current.videoWidth;
@@ -389,105 +456,151 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           <div className="absolute inset-0 bg-white z-40 animate-pulse transition-opacity duration-200" />
         )}
 
-        {/* Camera Feed Background: Real Live Video Stream or Fallback */}
+        {/* Camera Feed Background: Video Element ALWAYS MOUNTED in DOM to prevent mobile black screen */}
         <div className="absolute inset-0 z-0 bg-[#0d1217] flex items-center justify-center overflow-hidden">
-          {isUsingWebcam ? (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className={`w-full h-full object-cover ${
-                facingMode === 'user' ? 'scale-x-[-1]' : ''
-              }`}
-            />
-          ) : cameraStatus === 'starting' ? (
-            <div className="flex flex-col items-center justify-center gap-3 p-6 text-center text-white">
+          {/* Always-mounted video tag for streaming */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            onLoadedMetadata={() => {
+              videoRef.current?.play().catch(() => {});
+            }}
+            onCanPlay={() => {
+              setIsUsingWebcam(true);
+              setCameraStatus('active');
+            }}
+            onPlaying={() => {
+              setIsUsingWebcam(true);
+              setCameraStatus('active');
+            }}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+              isUsingWebcam ? 'opacity-100 z-1' : 'opacity-0 pointer-events-none'
+            } ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+          />
+
+          {/* When Camera is Connecting / Starting */}
+          {!isUsingWebcam && cameraStatus === 'starting' && (
+            <div className="relative z-10 flex flex-col items-center justify-center gap-3 p-6 text-center text-white">
               <div className="w-14 h-14 rounded-full border-4 border-[#85f8c4] border-t-transparent animate-spin" />
               <div className="flex flex-col gap-1">
                 <span className="text-[15px] font-bold text-[#85f8c4]">
                   {language === 'mr'
-                    ? 'कॅमेरा सुरू होत आहे...'
+                    ? 'फोन कॅमेरा सुरू होत आहे...'
                     : language === 'en'
-                    ? 'Starting camera / webcam...'
-                    : 'कैमरा शुरू हो रहा है...'}
+                    ? 'Opening Phone Camera...'
+                    : 'फ़ोन कैमरा शुरू हो रहा है...'}
                 </span>
-                <span className="text-[12px] text-white/70">
+                <span className="text-[12px] text-white/70 max-w-[240px]">
                   {language === 'mr'
-                    ? 'कृपया कॅमेरा परवानगी द्या'
+                    ? 'कृपया कॅमेरा परवानगी द्या किंवा खालील बटण दाबा'
                     : language === 'en'
-                    ? 'Connecting to your phone or PC camera'
-                    : 'कृपया फोन या लैपटॉप का कैमरा अनुमति दें'}
+                    ? 'Please allow camera or tap below to open phone camera'
+                    : 'कृपया कैमरा अनुमति दें या नीचे बटन से फ़ोटो खींचें'}
                 </span>
               </div>
+
+              {/* Instant Native Phone Camera Option */}
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic(25);
+                  fileInputRef.current?.click();
+                }}
+                className="mt-2 px-4 py-2 rounded-full bg-[#85f8c4] hover:bg-[#6ee7b7] text-[#002114] text-[13px] font-black flex items-center gap-2 shadow-lg active:scale-95 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                <span>
+                  {language === 'mr'
+                    ? 'थेट फोन कॅमेरा उघडा'
+                    : language === 'en'
+                    ? 'Open Phone Camera'
+                    : 'सीधे फ़ोन कैमरा खोलें'}
+                </span>
+              </button>
             </div>
-          ) : (
-            // Fallback preview image when camera is inactive/blocked
-            <div className="relative w-full h-full">
+          )}
+
+          {/* When Camera is Inactive, Blocked, Denied, or Error */}
+          {!isUsingWebcam && cameraStatus !== 'starting' && (
+            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-4 text-center">
               <img
                 src={selectedItem.imageUrl || CAMERA_PREVIEW_IMG}
-                alt="Scrap Camera Preview"
-                className="w-full h-full object-cover brightness-75"
+                alt="Scrap Preview"
+                className="absolute inset-0 w-full h-full object-cover opacity-25 filter blur-xs"
               />
-              <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center p-4 text-center">
-                <div className="w-12 h-12 rounded-full bg-[#ba1a1a]/90 text-white flex items-center justify-center mb-2 shadow-lg">
-                  <span className="material-symbols-outlined text-[28px]">videocam_off</span>
+              <div className="relative z-20 flex flex-col items-center max-w-[280px]">
+                <div className="w-14 h-14 rounded-2xl bg-[#006948] text-[#85f8c4] flex items-center justify-center mb-3 shadow-xl border border-[#85f8c4]/30">
+                  <span className="material-symbols-outlined text-[32px]">photo_camera</span>
                 </div>
-                <span className="text-[14px] font-bold text-white mb-1">
-                  {language === 'mr'
-                    ? 'कॅमेरा चालू नाही'
+                <span className="text-[15px] font-black text-white mb-1.5">
+                  {cameraStatus === 'denied'
+                    ? language === 'mr'
+                      ? 'कॅमेरा परवानगी आवश्यक'
+                      : language === 'en'
+                      ? 'Camera Permission Required'
+                      : 'कैमरा अनुमति आवश्यक'
+                    : language === 'mr'
+                    ? 'थेट फोन कॅमेऱ्याने फोटो काढा'
                     : language === 'en'
-                    ? 'Live Camera Offline'
-                    : 'कैमरा बंद / अनुमति आवश्यक'}
+                    ? 'Use Phone Camera'
+                    : 'फ़ोन कैमरे से फ़ोटो लें'}
                 </span>
-                <p className="text-[11px] text-white/80 max-w-[240px] mb-3 leading-relaxed">
+                <p className="text-[12px] text-white/80 mb-4 leading-relaxed">
                   {errorMessage ||
                     (language === 'mr'
-                      ? 'कृपया खालील बटण दाबून कॅमेरा सुरू करा किंवा फोटो काढा.'
+                      ? 'खालील हिरवे बटण दाबून तुमच्या फोनचा मुख्य कॅमेरा उघडा.'
                       : language === 'en'
-                      ? 'Please tap below to start your webcam or phone camera.'
-                      : 'कृपया नीचे दिए गए बटन से कैमरा चालू करें या फ़ोटो खींचें।')}
+                      ? 'Tap the button below to take a photo using your phone camera.'
+                      : 'नीचे दिया बटन दबाकर अपने फ़ोन का कैमरा खोलें।')}
                 </p>
-                <div className="flex flex-wrap items-center justify-center gap-2">
+
+                <div className="flex flex-col w-full gap-2">
+                  {/* High Priority 100% Reliable Native Phone Camera Trigger */}
                   <button
                     type="button"
-                    onClick={() => startCamera(facingMode)}
-                    className="px-3 py-1.5 rounded-full bg-[#006948] hover:bg-[#00855d] text-white text-[12px] font-bold flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
+                    onClick={() => {
+                      triggerHaptic(30);
+                      fileInputRef.current?.click();
+                    }}
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#85f8c4] hover:bg-[#6ee7b7] text-[#002114] text-[13px] font-black flex items-center justify-center gap-2 shadow-lg active:scale-95 cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[16px]">videocam</span>
+                    <span className="material-symbols-outlined text-[20px]">photo_camera</span>
                     <span>
                       {language === 'mr'
-                        ? 'कॅमेरा पुन्हा सुरू करा'
+                        ? '📸 फोनचा कॅमेरा उघडा'
                         : language === 'en'
-                        ? 'Open Camera'
-                        : 'कैमरा चालू करें'}
+                        ? '📸 Open Phone Camera'
+                        : '📸 फ़ोन का कैमरा खोलें'}
                     </span>
                   </button>
 
-                  <label className="px-3 py-1.5 rounded-full bg-[#85f8c4] text-[#002114] text-[12px] font-bold flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      className="hidden"
-                      onChange={handleFileChange}
-                    />
-                    <span className="material-symbols-outlined text-[16px]">photo_camera</span>
+                  {/* Retry Live Stream */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic(20);
+                      startCamera(facingMode);
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-white/15 hover:bg-white/25 text-white text-[12px] font-bold flex items-center justify-center gap-1.5 backdrop-blur-md border border-white/20 active:scale-95 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">refresh</span>
                     <span>
                       {language === 'mr'
-                        ? 'थेट फोटो काढा'
+                        ? 'थेट स्ट्रीम पुन्हा सुरू करा'
                         : language === 'en'
-                        ? 'Take Photo'
-                        : 'फ़ोटो खींचें'}
+                        ? 'Retry Live Stream'
+                        : 'सीधा स्ट्रीम पुनः प्रयास करें'}
                     </span>
-                  </label>
+                  </button>
                 </div>
               </div>
             </div>
           )}
 
           {/* Vignette Shadow Gradients */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1f24]/70 via-transparent to-[#1a1f24]/90 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1f24]/70 via-transparent to-[#1a1f24]/90 pointer-events-none z-5" />
         </div>
 
         {/* Animated Scanning Laser Beam */}
